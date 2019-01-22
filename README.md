@@ -4,5 +4,5 @@ msp430 hex disassembler
 ## Build
 ```gnatmake d0xfa.adb```
 
-## Use
+## Usage
 ```./d0xfa [path_to_file].hex```

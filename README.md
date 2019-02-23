@@ -14,4 +14,5 @@ gnatmake -gnat2012 -D build/ d0xfa.adb
 ```
 ./a0xfa [path_to_asm_file].asm [path_to_hex_file].hex
 
-./d0xfa [path_to_hex_file].hex```
+./d0xfa [path_to_hex_file].hex
+```

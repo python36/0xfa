@@ -1,37 +1,18 @@
 with ada.text_io;
-with interfaces;
 with ada.command_line;
 with ada.strings.fixed;
-with ada.strings.maps.constants;
 with gnat.os_lib;
-with ada.unchecked_conversion;
 with ada.containers.vectors;
+
+with numbers; use numbers;
+with strings; use strings;
 
 procedure d0xfa is
   use type ada.text_io.count;
-  package natural_io is new ada.text_io.integer_io(natural);
-  function uint32_to_integer is
-    new ada.unchecked_conversion(source => interfaces.unsigned_32, target => integer);
-
-  subtype byte is interfaces.unsigned_8;
   use type byte;
-  subtype word is interfaces.unsigned_16;
   use type word;
-  
-  procedure print (s : string) renames ada.text_io.put_line;
-  procedure put (s : string) renames ada.text_io.put;
-  procedure put (s : character) renames ada.text_io.put;
 
   PROGRAMM_NAME : constant string := "d0xfa";
-
-  function sl (value : byte; amount : natural) return byte renames interfaces.shift_left;
-  function sr (value : byte; amount : natural) return byte renames interfaces.shift_right;
-  function sl (value : word; amount : natural) return word renames interfaces.shift_left;
-  function sr (value : word; amount : natural) return word renames interfaces.shift_right;
-  procedure inc (p_i : in out natural) is begin p_i := p_i + 1; end inc;
-  procedure dec (p_i : in out natural) is begin p_i := p_i - 1; end dec;
-  procedure inc (p_i : in out byte) is begin p_i := p_i + 1; end inc;
-  procedure dec (p_i : in out byte) is begin p_i := p_i - 1; end dec;
 
   file : ada.text_io.file_type;
 
@@ -48,42 +29,6 @@ procedure d0xfa is
     print(s);
     gnat.os_lib.os_exit(1);
   end error;
-
-  function trim (s : string) return string is
-  begin
-    return ada.strings.fixed.trim(s, ada.strings.left);
-  end trim;
-
-  function remove_ret_car (s : string) return string is
-  begin
-    if s(s'last) = ascii.cr then return s(s'first..(s'last - 1)); end if;
-    return s;
-  end remove_ret_car;
-
-  function lowercase (s : string) return string is
-  begin
-    return ada.strings.fixed.translate(s, ada.strings.maps.constants.lower_case_map);
-  end lowercase;
-
-  function hex (w : word) return string is
-    t_s : string(1..8);
-  begin
-    natural_io.put(t_s, natural(w), 16);
-    t_s := lowercase(t_s);
-    for i in t_s'range loop
-      if t_s(i) = '#' then
-        return ada.strings.fixed.tail(t_s(i+1..t_s'last-1), 4, '0');
-      end if;
-    end loop;
-    return "";
-  end hex;
-
-  function word_to_integer (w : word) return integer is
-    use type interfaces.unsigned_32;
-  begin
-    return uint32_to_integer(
-      (4294934528 * interfaces.unsigned_32(sr(w, 15))) or interfaces.unsigned_32(w));
-  end word_to_integer;
 
   subtype label_t is string(1..6);
   null_label : constant label_t := (others => ' ');
@@ -242,33 +187,33 @@ procedure d0xfa is
   procedure put_operand (op : address_t; op_m : addressing_modes) is
   begin
     if op_m = m_register then
-      put('r' & trim(op.address'img));
+      put('r' & ltrim(op.address'img));
     elsif op_m = m_indexed then
-      put(trim(word_to_integer(op.address)'img) & "(r" & trim(op.register'img) & ')');
+      put(ltrim(word_to_integer(op.address)'img) & "(r" & ltrim(op.register'img) & ')');
     elsif op_m = m_constant then
-      put('#' & trim(word_to_integer(op.address)'img));
+      put('#' & ltrim(word_to_integer(op.address)'img));
     elsif op_m = m_symbolic then
       if op.label /= null_label then
-        put(ada.strings.fixed.trim(op.label, ada.strings.right));
+        put(rtrim(op.label));
       else
         put("$");
         if word_to_integer(op.address) >= 0 then
           put("+");
         end if;
-        put(trim(word_to_integer(op.address)'img));
+        put(ltrim(word_to_integer(op.address)'img));
       end if;
     elsif op_m = m_absolute then
       if op.label /= null_label then
-        put('&' & ada.strings.fixed.trim(op.label, ada.strings.right));
+        put('&' & rtrim(op.label));
       else
-        put("&0x" & hex(op.address));
+        put("&" & hex(op.address));
       end if;
     elsif op_m = m_indirect_register then
-      put("@r" & trim(op.register'img));
+      put("@r" & ltrim(op.register'img));
     elsif op_m = m_indirect_autoincrement then
-      put("@r" & trim(op.register'img) & "+");
+      put("@r" & ltrim(op.register'img) & "+");
     elsif op_m = m_immediate then
-      put("#" & trim(word_to_integer(op.address)'img));
+      put("#" & ltrim(word_to_integer(op.address)'img));
     end if;
   end put_operand;
 
@@ -278,7 +223,7 @@ procedure d0xfa is
     cmd.command_raw := w;
     cmd.address := addr;
 
-    if addr >= 16#ffe0# then
+    if addr >= 16#ffc0# then
       cmd.command_type := t_interrupt;
       return cmd;
     end if;
@@ -336,7 +281,7 @@ procedure d0xfa is
       if tmp_command.address = tmp_addr then
         if tmp_command.label = null_label then
           tmp_command.label := ada.strings.fixed.head(
-            'l' & trim(label_counter'img), null_label'length);
+            'l' & ltrim(label_counter'img), null_label'length);
           inc(label_counter);
           programm_t.replace_element(programm, tmp_cursor, tmp_command);
         end if;
@@ -382,7 +327,7 @@ procedure d0xfa is
     end set_col;
 
     procedure put_hex_raw (w : word) is
-      strword : string(1..4) := hex(w);
+      strword : string(1..4) := image(w, 16);
     begin
       put(strword(3..4) & ' ' & strword(1..2));
     end put_hex_raw;
@@ -419,7 +364,7 @@ procedure d0xfa is
         if (sr(cmd.command_raw, 9) and 1) = 0 then
           put("+");
         end if;
-        put(trim(word_to_integer(
+        put(ltrim(word_to_integer(
           ((jcmd.command_raw and 1023) + 64512 * (
             sr(cmd.command_raw, 9) and 1) + 1) * 2)'img));
       else
@@ -435,7 +380,7 @@ procedure d0xfa is
     procedure put_label (s : string) is
     begin
       put(ada.strings.fixed.head(
-        ada.strings.fixed.trim(s, ada.strings.right) & ':', null_label'length));
+        rtrim(s) & ':', null_label'length));
     end put_label;
   begin
     if cmd.source.mode in m_symbolic|m_absolute then
@@ -491,6 +436,8 @@ procedure d0xfa is
             put_alternative_with_dst("incd" & repr_bw);
           end if;
         end if;
+      elsif cmd.command = f_xor and cmd.source.mode = m_constant and cmd.source.address = 16#ffff# then
+        put_alternative_with_dst("inv" & repr_bw);
       elsif cmd.command = f_bic and cmd.destination.mode = m_register and
           cmd.destination.register = 2 and cmd.source.mode = m_constant then
         if cmd.source.address = 1 then
@@ -530,7 +477,13 @@ procedure d0xfa is
           put_alternative_with_dst("decd" & repr_bw);
         end if;
       elsif cmd.command = f_mov then
-        if cmd.destination.mode = m_register and cmd.destination.address = 0 then
+        if cmd.source.mode = m_indirect_autoincrement and cmd.source.address = 1 then
+          if cmd.destination.mode = m_register and cmd.destination.address = 0 then
+            put_alternative("ret");
+          else
+            put_alternative_with_dst("pop" & repr_bw);
+          end if;
+        elsif cmd.destination.mode = m_register and cmd.destination.address = 0 then
           put_alternative("br");
           put_operand(cmd.source, cmd.source.mode);
         elsif cmd.source.mode = m_constant and cmd.source.address = 0 then
@@ -539,42 +492,34 @@ procedure d0xfa is
           else
             put_alternative_with_dst("clr" & repr_bw);
           end if;
-        elsif cmd.source.mode = m_indirect_autoincrement and cmd.source.address = 1 then
-          if cmd.destination.mode = m_register and cmd.destination.address = 0 then
-            put_alternative("ret");
-          else
-            put_alternative_with_dst("pop" & repr_bw);
-          end if;
         end if;
       end if;
     end if;
 
     set_col(59);
     if cmd.command_type = t_jump then
-        put_comment("0x" & hex(get_addr_by_offset(cmd)));
+        put_comment(hex(get_addr_by_offset(cmd)));
     else
       if cmd.source.mode = m_immediate then
-        put_comment("#0x" & hex(cmd.source.address));
+        put_comment('#' & hex(cmd.source.address));
       elsif cmd.source.mode = m_constant and cmd.source.address = 16#ffff# then
-        put_comment("#0x" & hex(cmd.source.address));
+        put_comment('#' & hex(cmd.source.address));
       elsif cmd.source.mode = m_symbolic then
-        put_comment(
-          "0x" & hex(cmd.address + 2 + cmd.source.address));
+        put_comment(hex(cmd.address + 2 + cmd.source.address));
       elsif cmd.source.mode = m_absolute then
-        put_comment("&0x" & hex(cmd.source.address));
+        put_comment('&' & hex(cmd.source.address));
       end if;
 
       if cmd.destination.mode = m_symbolic then
-        put_comment(
-          "0x" & hex(cmd.address + word(cmd.num_operands) * 2 + cmd.destination.address));
+        put_comment(hex(cmd.address + word(cmd.num_operands) * 2 + cmd.destination.address));
       elsif cmd.destination.mode = m_absolute then
-        put_comment("&0x" & hex(cmd.destination.address));
+        put_comment('&' & hex(cmd.destination.address));
       end if;
     end if;
 
     set_col(78);
     put("; ");
-    put(hex(cmd.address));
+    put(image(cmd.address, 16));
     shift_col(9);
     put_hex_raw(cmd.command_raw);
     if cmd.source.ext_word then
@@ -602,10 +547,12 @@ procedure d0xfa is
   addr, next_addr, op_addr : word := 0;
 
 begin
-  print(";;; 0xfa ;;;");
-  print("; d0xfa - msp430 disassembler (hex format [https://wikipedia.org/wiki/Intel_HEX])");
-  print("; ver 0.1.0");
-  print(";");
+  print(";;; 0xfa [http://0xfa.space] ;;;");
+  print("; d0xfa v0.1.0 - msp430 disassembler (ihex format [https://wikipedia.org/wiki/Intel_HEX])");
+  print("");
+  if ada.command_line.argument_count = 0 then
+    error("no input files");
+  end if;
   ada.text_io.open(file, ada.text_io.in_file, ada.command_line.argument(1));
   loop_read: while not ada.text_io.end_of_file(file) loop
     if l /= 0 or not is_end then
@@ -671,7 +618,7 @@ begin
             else
               if is_ssar then
                 ada.text_io.set_col(1);
-                print("; SSAR: 0x" & hex(sl(wt, 8) + sr(wt, 8)));
+                print("; SSAR: " & hex(sl(wt, 8) + sr(wt, 8)));
               else
                 operand_to_command(cmd, wt, op_l);
               end if;
@@ -716,7 +663,7 @@ begin
         put(';');
       end if;
       ada.text_io.set_col((ada.text_io.count(tmp_command.address - 16#ffe0#) mod 16) * 6 + 3);
-      put(hex(tmp_command.address) & ": " & hex(tmp_command.command_raw) & " ");
+      put(image(tmp_command.address, 16) & ": " & image(tmp_command.command_raw, 16) & " ");
     else
       if must_be_next_addr /= 0 and must_be_next_addr /= tmp_command.address then
         print("; ...");

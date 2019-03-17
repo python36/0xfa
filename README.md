@@ -6,8 +6,13 @@ msp430 hex disassembler
 ## Build
 ```
 mkdir build
-gnatmake -gnat2012 -D build/ a0xfa.adb
+gnatmake -gnat2012 -D build/ -Igetters/ a0xfa.adb
 gnatmake -gnat2012 -D build/ d0xfa.adb
+```
+
+## Test
+```
+  ./a0xfa examples/blink.asm examples/blink.hex
 ```
 
 ## Usage

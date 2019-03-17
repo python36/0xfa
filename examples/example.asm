@@ -39,7 +39,7 @@ label:
   ; >> <<
   ; & (and)
   ; ^ (xor)
-  ; | (or)
+  ; | (or) ; lowest priority
 
 ; example
 add {var0 * ((2 + var2) / 4) << 3}, r4

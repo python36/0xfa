@@ -3,6 +3,9 @@ msp430 assembler
 # d0xfa
 msp430 hex disassembler
 
+## Doc
+See examples/example.asm
+
 ## Build
 ```
 mkdir build

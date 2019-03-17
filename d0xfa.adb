@@ -427,7 +427,8 @@ procedure d0xfa is
         end if;
       elsif cmd.command = f_add then
         if cmd.source.mode = cmd.destination.mode and
-            cmd.source.address = cmd.destination.address then
+            (cmd.source.address = cmd.destination.address or (
+              cmd.source.mode = m_symbolic and cmd.source.address - 2 = cmd.destination.address)) then
           put_alternative_with_dst("rla" & repr_bw);
         elsif cmd.source.mode = m_constant then
           if cmd.source.address = 1 then

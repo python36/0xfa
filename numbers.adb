@@ -10,10 +10,11 @@ package body numbers is
   procedure incd (p_i : in out word) is begin p_i := p_i + 2; end incd;
   function incd (p_i : word) return word is begin return p_i + 2; end incd;
   procedure decd (p_i : in out word) is begin p_i := p_i - 2; end decd;
+  function swpb (w : word) return word is begin return sr(w, 8) or sl(w, 8); end swpb;
+  procedure swpb (w : in out word) is begin w := swpb(w); end swpb;
 
   function words_add (a, b : word) return word is begin return a + b; end words_add;
-
-  function words_sub (a, b : word) return word  is begin return a + b; end words_sub;
+  function words_sub (a, b : word) return word  is begin return a - b; end words_sub;
   function words_mul (a, b : word) return word  is begin return a * b; end words_mul;
   function words_div (a, b : word) return word  is begin return a / b; end words_div;
   function words_pow (a, b : word) return word  is begin return a ** natural(b); end words_pow;

@@ -6,16 +6,23 @@ with ada.strings.bounded;
 with ada.containers.vectors;
 with ada.containers.indefinite_ordered_maps;
 with ada.containers.ordered_maps;
+with ada.containers.doubly_linked_lists;
 with interfaces;
 with ada.exceptions;
 with ada.containers;
-with gnat.regexp;
 with ada.io_exceptions;
+with ada.finalization;
+
+with getter;
+with getter.file;
+with getter.for_loop;
+with getter.macros;
 
 with numbers; use numbers;
 with strings; use strings;
 with address; use address;
 with labels; use labels;
+with env; use env;
 
 procedure a0xfa is
   use type byte;
@@ -25,7 +32,6 @@ procedure a0xfa is
 
   programm_address : pos_addr_t := create(0);
   ff : constant word := 16#ffff#;
-  variable_regexp : gnat.regexp.regexp := gnat.regexp.compile("[a-z][a-z0-9_]*");
 
   r_pc : constant word := 0;
   r_sp : constant word := 1;
@@ -50,9 +56,6 @@ procedure a0xfa is
 
   type operation_access is access function (a, b : word) return word;
 
-  package environment_t is new ada.containers.indefinite_ordered_maps(
-    element_type => word, key_type => string);
-  environment : environment_t.map;
   parse_def_cursor : environment_t.cursor := environment_t.no_element;
 
   type operation_t is record
@@ -142,7 +145,7 @@ procedure a0xfa is
   procedure void (r : record_handler_type) is begin null; end void;
 
   function parse_main (s : string) return record_handler_type;
-  procedure from_file (path : string);
+  -- procedure from_file (path : string);
 
   function parse_word (s : string) return word is
   begin
@@ -157,11 +160,6 @@ procedure a0xfa is
   exception
     when constraint_error => return false;
   end validate_register;
-
-  function validate_variable (s : string) return boolean is
-  begin
-    return gnat.regexp.match(s, variable_regexp);
-  end validate_variable;
 
   procedure validate_variable_assert (s : string) is
   begin
@@ -201,9 +199,164 @@ procedure a0xfa is
     if first_element(s) /= '"' or last_element(s) /= '"' then
       error_parse("error .include format");
     end if;
-    from_file(trim(s((s'first + 1)..(s'last - 1))));
+    -- from_file(trim(s((s'first + 1)..(s'last - 1))));
+    getter.file.open(trim(s((s'first + 1)..(s'last - 1))));
     return (ptr => parse_main'access);
   end parse_include;
+
+  type for_loop_step_t is (for_loop_var, for_loop_mode, for_loop_range);
+  for_loop_step : for_loop_step_t := for_loop_var;
+
+  tmp_for_loop_cursor : environment_t.cursor;
+
+  function parse_for_loop (s : string) return record_handler_type is
+    tb : boolean;
+    dots_pos : natural;
+  begin
+    if for_loop_step = for_loop_var then
+      validate_variable_assert(s);
+      environment.insert(s, 0, tmp_for_loop_cursor, tb);
+      if not tb then
+        error_parse("variable name """ & s & """ already defined");
+      end if;
+      for_loop_step := for_loop_mode;
+    elsif for_loop_step = for_loop_mode then
+      if s /= "in" then
+        error_parse("error format for: " & s);
+      end if;
+      for_loop_step := for_loop_range;
+    elsif for_loop_step = for_loop_range then
+      dots_pos := fix.index(s, "..");
+      if dots_pos < 2 or (dots_pos + 1) >= s'last then
+        error_parse("error range: " & s);
+      end if;
+      getter.for_loop.create(
+        parse_word(s(s'first..(dots_pos - 1))),
+        parse_word(s((dots_pos + 2)..s'last)),
+        tmp_for_loop_cursor);
+      for_loop_step := for_loop_var;
+      return (ptr => parse_main'access);
+    end if;
+    return (ptr => parse_for_loop'access);
+  end parse_for_loop;
+
+  macro_name : unb.unbounded_string := unb.null_unbounded_string;
+  macro_params : unb.unbounded_string := unb.null_unbounded_string;
+  macro_wait_open : boolean := false;
+
+  function get_macros_name_params (s : string) return boolean is
+    use type unb.unbounded_string;
+
+    open_pos : natural := 1;
+
+    procedure set_macro_name (name : string) is
+    begin
+      if not validate_variable(name) then
+        error_parse("error macros name: " & name);
+      end if;
+      macro_name := unb.to_unbounded_string(name);
+    end set_macro_name;
+
+    procedure append_param (s : string) is
+    begin
+      if s'length = 0 then
+        return;
+      end if;
+      unb.append(macro_params, s & ' ');
+    end append_param;
+  begin
+    if macro_name = unb.null_unbounded_string then
+      macro_wait_open := true;
+      open_pos := fix.index(s, "(");
+      if open_pos > 0 then
+        set_macro_name(s(s'first..(open_pos - 1)));
+      else
+        set_macro_name(s);
+        return false;
+      end if;
+    end if;
+
+    if macro_wait_open then
+      if s(open_pos) /= '(' then
+        error_parse("wait '(' but: " & s);
+      end if;
+      macro_wait_open := false;
+      inc(open_pos);
+    end if;
+
+    if endswith(s, ')') then
+      if s'length > 1 then
+        append_param(s(open_pos..(s'last - 1)));
+      end if;
+      return true;
+    else
+      append_param(s(open_pos..s'last));
+    end if;
+
+    return false;
+  end get_macros_name_params;
+
+  function parse_macros (s : string) return record_handler_type is
+  --   use type unb.unbounded_string;
+
+  --   open_pos : natural := 1;
+
+  --   procedure set_macro_name (name : string) is
+  --   begin
+  --     if not validate_variable(name) then
+  --       error_parse("error macros name: " & name);
+  --     end if;
+  --     macro_name := unb.to_unbounded_string(name);
+  --   end set_macro_name;
+
+  --   procedure append_param (s : string) is
+  --   begin
+  --     if s'length = 0 then
+  --       return;
+  --     end if;
+  --     if not validate_variable(s) then
+  --       error_parse("error param: |" & s & "|");
+  --     end if;
+  --     unb.append(macro_params, s & ' ');
+  --   end append_param;
+  begin
+  --   if macro_name = unb.null_unbounded_string then
+  --     macro_wait_open := true;
+  --     open_pos := fix.index(s, "(");
+  --     if open_pos > 0 then
+  --       set_macro_name(s(s'first..(open_pos - 1)));
+  --     else
+  --       set_macro_name(s);
+  --       return (ptr => parse_macros'access);
+  --     end if;
+  --   end if;
+
+  --   if macro_wait_open then
+  --     if s(open_pos) /= '(' then
+  --       error_parse("wait '(' but: " & s);
+  --     end if;
+  --     macro_wait_open := false;
+  --     inc(open_pos);
+  --   end if;
+    if get_macros_name_params(s) then
+      getter.macros.define(unb.to_string(macro_name), unb.to_string(macro_params));
+      macro_name := unb.null_unbounded_string;
+      macro_params := unb.null_unbounded_string;
+      return (ptr => parse_main'access);
+    end if;
+    return (ptr => parse_macros'access);
+  --   if endswith(s, ')') then
+  --     if s'length > 1 then
+  --       append_param(s(open_pos..(s'last - 1)));
+  --     end if;
+  --     getter.macros.define(unb.to_string(macro_name), unb.to_string(macro_params));
+  --     return (ptr => parse_main'access);
+  --   else
+  --     append_param(s(open_pos..s'last));
+  --   end if;
+
+  --   return (ptr => parse_macros'access);
+  end parse_macros;
 
   function parse_instruction (s : string) return record_handler_type is
   begin
@@ -211,6 +364,10 @@ procedure a0xfa is
       return (ptr => parse_def'access);
     elsif s = ".include" then
       return (ptr => parse_include'access);
+    elsif s = ".for" then
+      return (ptr => parse_for_loop'access);
+    elsif s = ".macro" then
+      return (ptr => parse_macros'access);
     elsif s = ".defs" then
       return (ptr => parse_defs'access);
     end if;
@@ -272,6 +429,7 @@ procedure a0xfa is
     tmp_cursor : environment_t.cursor;
   begin
     tmp_cursor := environment_t.find(environment, s);
+    -- environment_repr;
     if environment_t.has_element(tmp_cursor) then
       return environment_t.element(tmp_cursor);
     end if;
@@ -292,12 +450,16 @@ procedure a0xfa is
     tmp_operation : operation_t;
     k_priority : natural := 0;
   begin
+    -- print(s);
     while i < s'last + 1 loop
       if s(i) in '0'..'9'|'a'..'z'|'_' then
         if start_pos = end_pos then
           start_pos := i;
           end_pos := i + 1;
         else
+          if i /= end_pos then
+            error_parse("error " & s(start_pos..i));
+          end if;
           inc(end_pos);
         end if;
       else
@@ -314,10 +476,12 @@ procedure a0xfa is
           if s(start_pos) in 'a'..'z' then
             operands.append(get_var_val(s(start_pos..(end_pos - 1))));
           else
+            -- print(s(start_pos..(end_pos - 1)));
             operands.append(parse_word(s(start_pos..(end_pos - 1))));
           end if;
 
           if s(i) = ';' then
+            -- print(start_pos'img & end_pos'img & i'img);
             exit;
           elsif s(i) = '<' then
             if s(i + 1) /= '<' then
@@ -379,7 +543,7 @@ procedure a0xfa is
     end if;
 
     if operations_t.length(operations) = 0 and operands_t.length(operands) = 1 then
-      return operands_t.first_element(operands)'img;
+      return ltrim(operands_t.first_element(operands)'img);
     end if;
     while operations_t.length(operations) > 0 loop
       tmp_operation := operations_t.first_element(operations);
@@ -391,7 +555,7 @@ procedure a0xfa is
       operations_t.delete_first(operations);
     end loop;
 
-    return value'img;
+    return ltrim(value'img);
   end parse_precompile;
 
   function operand_has_ext_word (operand : operand_t) return boolean is
@@ -597,11 +761,16 @@ procedure a0xfa is
     open_pos, close_pos : natural;
   begin
     if first_element(s) = '#' then
-      addr.value := parse_word(cdr(s));
-      if addr.value in 0..2|4|8|ff then
-        addr.mode := m_constant;
+      addr.mode := m_immediate;
+      if s(s'first + 1) in '0'..'9'|'-' then
+        addr.value := parse_word(cdr(s));
+        if addr.value in 0..2|4|8|ff then
+          addr.mode := m_constant;
+        end if;
+      elsif in_labels(cdr(s)) then
+        addr.label := get_by_name(cdr(s));
       else
-        addr.mode := m_immediate;
+        addr.label := create(cdr(s));
       end if;
     elsif first_element(s) = ''' and s'length = 3 then
       addr.mode := m_immediate;
@@ -701,6 +870,7 @@ procedure a0xfa is
     else
       command.source.value := parse_word(s);
     end if;
+    -- command.source.value := swpb(command.source.value);
     command.source.mode := m_constant;
     command.command := f_raw;
     command.num_operands := 0;
@@ -744,6 +914,17 @@ procedure a0xfa is
     return (ptr => parse_string'access);
   end parse_string;
 
+  function parse_call_macros (s : string) return record_handler_type is
+  begin
+    if get_macros_name_params(s) then
+      getter.macros.call(unb.to_string(macro_name), unb.to_string(macro_params));
+      macro_name := unb.null_unbounded_string;
+      macro_params := unb.null_unbounded_string;
+      return (ptr => parse_main'access);
+    end if;
+    return (ptr => parse_call_macros'access);
+  end parse_call_macros;
+
   function parse_main (s : string) return record_handler_type is
   begin
     if first_element(s) = '.' then
@@ -751,7 +932,9 @@ procedure a0xfa is
     elsif last_element(s) = ':' then
       return parse_label(s(s'first..(s'last - 1)));
     elsif first_element(s) in 'a'..'z' then
-      if validate_command(s) then
+      if fix.index(s, "(") > 1 then
+        return parse_call_macros(s);
+      elsif validate_command(s) then
         return parse_operation(s);
       else
         return parse_raw(s);
@@ -767,68 +950,263 @@ procedure a0xfa is
     return (ptr => parse_main'access);
   end parse_main;
 
-  function preparse (s : string) return string is
-    start_pos, end_pos, comment_pos : natural;
-  begin
-    comment_pos := fix.index(s, ";", ada.strings.forward);
-    start_pos := fix.index(s, "{", ada.strings.backward);
-    if start_pos > 0 and start_pos < comment_pos then
-      end_pos := fix.index(s, "}", start_pos, ada.strings.forward);
-      if end_pos < start_pos or end_pos > comment_pos then
-        error_parse("error """ & s & """ no closed brackets");
-      end if;
-      return preparse(
-        s(s'first..(start_pos-1)) &
-        ltrim(parse_precompile(s((start_pos + 1)..(end_pos - 1)) & ';')) &
-        s((end_pos + 1)..s'last));
-    end if;
-    return s;
-  end preparse;
+  -- function preparse (s : string) return string is
+  --   start_pos, end_pos, comment_pos : natural;
+  -- begin
+  --   comment_pos := fix.index(s, ";", ada.strings.forward);
+  --   start_pos := fix.index(s, "{", ada.strings.backward);
+  --   if start_pos > 0 and start_pos < comment_pos then
+  --     end_pos := fix.index(s, "}", start_pos, ada.strings.forward);
+  --     if end_pos < start_pos or end_pos > comment_pos then
+  --       error_parse("error """ & s & """ no closed brackets");
+  --     end if;
+  --     return preparse(
+  --       s(s'first..(start_pos-1)) &
+  --       parse_precompile(s((start_pos + 1)..(end_pos - 1)) & ';') &
+  --       s((end_pos + 1)..s'last));
+  --   end if;
+  --   return s;
+  -- end preparse;
+ -- вынести в модуль и сделать через финализе
+  type code_t is access all unb.unbounded_string;
 
-  procedure from_file (path : string) is
-    file : ada.text_io.file_type;
-    tmp_ustr : unb.unbounded_string;
-    handler_ptr : handler_type := parse_main'access;
-    cur_pos : natural := 0;
-    last_space : natural := 0;
-    cur_line : positive := 1;
+  type pre_code_t is record
+    start_pos, end_pos : natural;
+    code : code_t;
+  end record;
+  result : aliased unb.unbounded_string;
+
+  -- type for_loop_t is record
+  --   start_i, end_i, cur_i : natural;
+  --   cursor : environment_t.cursor := environment_t.no_element;
+  --   code : unb.unbounded_string;
+  --   last : positive := 1;
+  -- end record;
+  -- for_loop_status : natural := 0;
+  -- package for_loops_t is new ada.containers.vectors(element_type => for_loop_t, index_type => natural);
+  -- for_loops : for_loops_t.vector;
+  -- tmp_for_loop, last_for_loop : for_loop_t;
+  -- for_end_offset : natural := 0;
+
+  function pre_code_cmp (a, b : pre_code_t) return boolean is
   begin
-    ada.text_io.open(file, ada.text_io.in_file, path);
-    while not ada.text_io.end_of_file(file) loop
-      last_space := 0;
-      cur_pos := 0;
-      for c of string'(preparse(lowercase(remove_ret_car(ada.text_io.get_line(file) & ';')))) loop
-        inc(cur_pos);
-        if c = ' ' or c = ',' or c = ';' then
-          if cur_pos /= last_space + 1 then
-            handler_ptr := handler_ptr(unb.to_string(tmp_ustr)).ptr;
+    return false;
+  end pre_code_cmp;
+  package pre_codes_t is new ada.containers.doubly_linked_lists(pre_code_t, pre_code_cmp);
+  pre_codes : pre_codes_t.list;
+
+  end_asm : boolean := false;
+
+
+  -- type record_getter_type;
+  -- type getter_type is access function (getter : in out record_getter_type) return character;
+  -- type record_getter_type is record
+  --   ptr : getter_type;
+  -- end record;
+
+  -- current_file : ada.text_io.file_type;
+
+  -- function get_from_file (getter : in out record_getter_type) return character is
+  -- begin
+  --   if ada.text_io.end_of_file(current_file) then
+  --     return ascii.nul;
+  --   end if;
+  -- end get_from_file;
+
+
+
+  function get_line return string is
+    use type unb.unbounded_string;
+    use type ada.containers.count_type;
+
+    -- start_for : constant unb.unbounded_string := unb.to_unbounded_string(".for");
+    -- end_for : constant unb.unbounded_string := unb.to_unbounded_string(".end_for");
+    -- in_for : constant unb.unbounded_string := unb.to_unbounded_string("in");
+
+    last_code : code_t := result'access;
+    c : character;
+    -- tb : boolean;
+    -- dots_pos : natural;
+  begin
+    loop
+      result := unb.null_unbounded_string;
+      loop
+        -- -- if not for_loops_t.is_empty(for_loops) then
+        --   c := ' ';
+        --   if unb.length(last_for_loop.code) < last_for_loop.last then
+        --     inc(last_for_loop.cur_i);
+        --     last_for_loop.last := 1;
+        --     environment.replace_element(last_for_loop.cursor, word(last_for_loop.cur_i));
+        --   else
+        --     c := unb.element(last_for_loop.code, last_for_loop.last);
+        --     inc(last_for_loop.last);
+        --   end if;
+
+        --   if last_for_loop.cur_i > last_for_loop.end_i then
+        --     for_loop_status := 0;
+        --     environment.delete(last_for_loop.cursor);
+        --     for_loops.delete_last;
+        --     if for_loops_t.length(for_loops) > 0 then
+        --       last_for_loop := for_loops_t.last_element(for_loops);
+        --     end if;
+        --   end if;
+        -- -- elsif ada.text_io.end_of_file(file) then
+        -- --   c := ' ';
+        -- --   end_asm := true;
+        -- else
+          c := getter.get;
+          if c = ascii.nul then
+            end_asm := true;
+            return "";
           end if;
-          clear(tmp_ustr);
-          last_space := cur_pos;
-        else
-          unb.append(tmp_ustr, c);
-        end if;
-        exit when c = ';';
-      end loop;
-      inc(cur_line);
-    end loop;
+        -- end if;
 
-    ada.text_io.close(file);
+        -- if for_loop_status = 4 then
+        --   unb.append(tmp_for_loop.code, c);
+        --   -- if ada.text_io.end_of_line(file) and for_loops_t.is_empty(for_loops) then
+        --   --   unb.append(tmp_for_loop.code, ' ');
+        --   -- end if;
+        -- end if;
+
+        -- \; \{ \} \  \, \\ \.
+        -- if c = ';' then
+        --   if not ada.text_io.end_of_line(file) then
+        --     ada.text_io.skip_line(file);
+        --   end if;
+        --   exit when pre_codes_t.is_empty(pre_codes);
+        if c = '{' then
+          pre_codes.append((0, 0, new unb.unbounded_string));
+          last_code := pre_codes_t.last_element(pre_codes).code;
+        elsif c = '}' then
+          if pre_codes_t.is_empty(pre_codes) then
+            error_parse("""}"" without start");
+          end if;
+          if pre_codes_t.has_element(pre_codes_t.previous(pre_codes_t.last(pre_codes))) then
+            unb.append(pre_codes_t.element(pre_codes_t.previous(pre_codes_t.last(pre_codes))).code.all, parse_precompile(unb.to_string(last_code.all) & ';'));
+          else
+            unb.append(result, parse_precompile(unb.to_string(last_code.all) & ';'));
+          end if;
+          -- free(last_code);
+          pre_codes.delete_last;
+          if pre_codes_t.is_empty(pre_codes) then
+            last_code := result'access;
+          else
+            last_code := pre_codes_t.last_element(pre_codes).code;
+          end if;
+        elsif pre_codes_t.is_empty(pre_codes) and c in ' '|',' then
+          exit;
+        else
+          unb.append(last_code.all, c);
+        end if;
+
+        -- if ada.text_io.end_of_line(file) and for_loop_status /= 5 and for_loops_t.is_empty(for_loops) then
+        --   exit when pre_codes_t.is_empty(pre_codes);
+        --   unb.append(last_code.all, ' ');
+        -- end if;
+      end loop;
+
+      -- if for_loop_status = 1 then
+      --   validate_variable_assert(unb.to_string(result));
+      --   environment.insert(unb.to_string(result), 0, tmp_for_loop.cursor, tb);
+      --   if not tb then
+      --     error_parse("variable name """ & unb.to_string(result & """ already defined"));
+      --   end if;
+
+      --   inc(for_loop_status);
+      -- elsif for_loop_status = 2 then
+      --   if result /= in_for then
+      --     error_parse("error format for");
+      --   end if;
+      --   inc(for_loop_status);
+      -- elsif for_loop_status = 3 then
+      --   dots_pos := unb.index(result, "..");
+      --   if dots_pos < 2 or (dots_pos + 1) >= unb.length(result) then
+      --     error_parse("error range: " & unb.to_string(result));
+      --   end if;
+      --   tmp_for_loop.start_i := natural(parse_word(unb.slice(result, 1, dots_pos - 1)));
+      --   tmp_for_loop.cur_i := tmp_for_loop.start_i;
+      --   tmp_for_loop.end_i := natural(parse_word(unb.slice(result, dots_pos + 2, unb.length(result))));
+
+      --   environment.replace_element(tmp_for_loop.cursor, word(tmp_for_loop.cur_i));
+
+      --   inc(for_loop_status);
+      -- elsif result = start_for then
+      --   if for_loop_status = 4 then
+      --     inc(for_end_offset);
+      --   else
+      --     for_loop_status := 1;
+      --     tmp_for_loop.code := unb.null_unbounded_string;
+      --     tmp_for_loop.last := 1;
+      --   end if;
+      -- elsif for_loop_status = 4 then
+      --   if result = end_for then
+      --     if for_end_offset /= 0 then
+      --       dec(for_end_offset);
+      --     else
+      --       unb.replace_slice(tmp_for_loop.code, unb.length(tmp_for_loop.code) - 8, unb.length(tmp_for_loop.code), " ");
+      --       if for_loops_t.length(for_loops) > 0 then
+      --         for_loops.replace_element(for_loops_t.last(for_loops), last_for_loop);
+      --       end if;
+      --       last_for_loop := tmp_for_loop;
+      --       for_loops.append(last_for_loop);
+      --       for_loop_status := 5;
+      --     end if;
+      --   end if;
+      -- else
+        return unb.to_string(result);
+      -- end if;
+    end loop;
+    return "";
+  end get_line;
+
+  procedure from_file is
+    -- file : ada.text_io.file_type;
+    -- tmp_ustr : unb.unbounded_string;
+    handler_ptr : handler_type := parse_main'access;
+    -- cur_pos : natural := 0;
+    -- last_space : natural := 0;
+  begin
+    -- getter.file.open(path);
+    while not end_asm loop
+      -- print(end_asm'img & path);
+      declare
+        l : constant string := get_line;
+      begin
+        -- print(l & end_asm'img);
+        if l /= "" then
+          handler_ptr := handler_ptr(l).ptr;
+        end if;
+      end;
+    end loop;
+    end_asm := false;
+
+    -- ada.text_io.open(file, ada.text_io.in_file, path);
+    -- while not end_asm loop
+    --   declare
+    --     l : constant string := get_line(file);
+    --   begin
+    --     if l /= "" then
+    --       handler_ptr := handler_ptr(l).ptr;
+    --     end if;
+    --   end;
+    -- end loop;
+    -- end_asm := false;
+    -- ada.text_io.close(file);
   exception
     when this_error: parse_error =>
       if ada.exceptions.exception_message(this_error) /= "" then
-        print(path & '[' & ltrim(cur_line'img) & "]: " &
+        print('[' & ltrim(getter.get_line'img) & "]: " &
               ada.exceptions.exception_message(this_error));
       end if;
-      ada.text_io.close(file);
+      -- ada.text_io.close(file);
       raise parse_error with "";
     when ada.io_exceptions.name_error =>
-      error_parse("no such file " & path);
+      -- error_parse("no such file " & path);
       raise;
     when others =>
-      if ada.text_io.is_open(file) then
-        ada.text_io.close(file);
-      end if;
+      -- if ada.text_io.is_open(file) then
+      --   ada.text_io.close(file);
+      -- end if;
       raise;
   end from_file;
 
@@ -849,7 +1227,7 @@ procedure a0xfa is
   package line_t is new ada.strings.bounded.generic_bounded_length(max => 40);
   out_file : ada.text_io.file_type;
   words : words_t(0..18);
-  size : word;
+  size : word := 0;
 
   procedure command_to_words (cmd : command_t; addr : pos_addr_t) is
     operation : word := 0;
@@ -861,12 +1239,6 @@ procedure a0xfa is
     end set_bits;
 
     procedure repr_ext_word (op : operand_t) is
-      -- procedure check_odd is
-      -- begin
-      --   if odd(op.value) then
-      --     error_parse("odd address " & hex(op.value));
-      --   end if;
-      -- end check_odd;
     begin
       if operand_has_ext_word(op) then
         inc(words(0));
@@ -880,14 +1252,18 @@ procedure a0xfa is
           if op.label /= null_label then
             words(words(0)) := get(get(op.label));
           else
-            -- check_odd;
+            words(words(0)) := op.value;
+          end if;
+        elsif op.mode = m_immediate then
+          if op.label /= null_label then
+            words(words(0)) := get(get(op.label));
+          else
             words(words(0)) := op.value;
           end if;
         elsif op.mode = m_symbolic then
           if op.label /= null_label then
             words(words(0)) := get(get(op.label) - addr) - offset;
           else
-            -- check_odd;
             words(words(0)) := op.value - get(addr) - offset;
           end if;
         else
@@ -1017,6 +1393,7 @@ procedure a0xfa is
       end if;
       set_bits(10, 10, w);
     end if;
+
     inc(words(0));
     w := words(0);
     repr_operands;
@@ -1027,7 +1404,6 @@ procedure a0xfa is
     l : word := word'min(words(0), 8);
     checksum : word;
   begin
-    -- print(l'img);
     if l = 0 then
       return;
     end if;
@@ -1072,9 +1448,10 @@ begin
   if ada.command_line.argument_count /= 2 then
     error("format: a0xfa input_file_path output_file_path");
   end if;
-  from_file(ada.command_line.argument(1));
+  getter.file.open(ada.command_line.argument(1));
+  from_file;
 
-  reti_address := create(get_var_val("mem_code_end"));
+  reti_address := create(get_var_val("mem_code_end") - 1);
   loop
     programm_t.insert(programm, reti_address, (f_reti, null_operand, null_operand, 0, true), reti_cursor, reti_inserted);
     exit when reti_inserted;
@@ -1086,6 +1463,7 @@ begin
 
   cur := programm.first;
   line_addr := programm.first_key;
+  words(0) := 0;
   while programm_t.has_element(cur) loop
     command_to_words(programm_t.element(cur), programm_t.key(cur));
     programm_t.next(cur);

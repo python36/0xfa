@@ -44,6 +44,8 @@ package numbers is
   procedure incd (p_i : in out word);
   function incd (p_i : word) return word;
   procedure decd (p_i : in out word);
+  function swpb (w : word) return word;
+  procedure swpb (w : in out word);
 
   function word_to_integer (w : word) return integer;
 

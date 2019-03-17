@@ -23,7 +23,9 @@ package strings is
   function last_element (us : unb.unbounded_string) return character;
 
   function endswith (s, p : string) return boolean;
+  function endswith (s : string; c : character) return boolean;
   function startswith (s, p : string) return boolean;
+  function startswith (s : string; c : character) return boolean;
 
   function ltrim (s : string; c : character := ' ') return string;
   function rtrim (s : string; c : character := ' ') return string;

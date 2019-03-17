@@ -14,9 +14,19 @@ package body strings is
     return s'length >= p'length and then s((s'last - p'length + 1)..s'last) = p;
   end endswith;
 
+  function endswith (s : string; c : character) return boolean is
+  begin
+    return s'length /= 0 and then s(s'last) = c;
+  end endswith;
+
   function startswith (s, p : string) return boolean is
   begin
     return s'length >= p'length and then s(s'first..(s'first + p'length - 1)) = p;
+  end startswith;
+
+  function startswith (s : string; c : character) return boolean is
+  begin
+    return s'length /= 0 and then s(s'first) = c;
   end startswith;
 
   function first_element (s : string) return character is

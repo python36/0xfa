@@ -9,8 +9,7 @@ See examples/example.asm
 ## Build
 ```
 mkdir build
-gnatmake -gnat2012 -D build/ -Igetters/ a0xfa.adb
-gnatmake -gnat2012 -D build/ d0xfa.adb
+bash build.sh
 ```
 
 ## Test

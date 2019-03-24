@@ -48,6 +48,11 @@ procedure a0xfa is
     raise parse_error with s;
   end error_parse;
 
+  procedure warning (msg : string) is
+  begin
+    print("[warning]: " & msg);
+  end warning;
+
   type record_handler_type;
   type handler_type is access function (s : string) return record_handler_type;
   type record_handler_type is record
@@ -175,10 +180,10 @@ procedure a0xfa is
     if parse_def_cursor = environment_t.no_element then
       validate_variable_assert(s);
       environment.insert(s, 0, parse_def_cursor, tb);
-      if tb then
-        return (ptr => parse_def'access);
+      if not tb then
+        warning("variable """ & s & """ redefined");
       end if;
-      error_parse("variable name """ & s & """ already defined");
+      return (ptr => parse_def'access);
     end if;
     environment.replace_element(parse_def_cursor, parse_word(s));
     parse_def_cursor := environment_t.no_element;
@@ -194,12 +199,32 @@ procedure a0xfa is
     return (ptr => parse_defs'access);
   end parse_defs;
 
+  function parse_undef (s : string) return record_handler_type is
+  begin
+    validate_variable_assert(s);
+    if not environment_t.contains(environment, s) then
+      warning("variable name """ & s & """ not defined");
+    else
+      environment.delete(s);
+    end if;
+    return (ptr => parse_main'access);
+  end parse_undef;
+
+  function parse_set (s : string) return record_handler_type is
+  begin
+    validate_variable_assert(s);
+    if not environment_t.contains(environment, s) then
+      error_parse("variable name """ & s & """ not defined");
+    end if;
+    void(parse_undef(s));
+    return parse_def(s);
+  end parse_set;
+
   function parse_include (s : string) return record_handler_type is
   begin
     if first_element(s) /= '"' or last_element(s) /= '"' then
       error_parse("error .include format");
     end if;
-    -- from_file(trim(s((s'first + 1)..(s'last - 1))));
     getter.file.open(trim(s((s'first + 1)..(s'last - 1))));
     return (ptr => parse_main'access);
   end parse_include;
@@ -297,47 +322,7 @@ procedure a0xfa is
   end get_macros_name_params;
 
   function parse_macros (s : string) return record_handler_type is
-  --   use type unb.unbounded_string;
-
-  --   open_pos : natural := 1;
-
-  --   procedure set_macro_name (name : string) is
-  --   begin
-  --     if not validate_variable(name) then
-  --       error_parse("error macros name: " & name);
-  --     end if;
-  --     macro_name := unb.to_unbounded_string(name);
-  --   end set_macro_name;
-
-  --   procedure append_param (s : string) is
-  --   begin
-  --     if s'length = 0 then
-  --       return;
-  --     end if;
-  --     if not validate_variable(s) then
-  --       error_parse("error param: |" & s & "|");
-  --     end if;
-  --     unb.append(macro_params, s & ' ');
-  --   end append_param;
   begin
-  --   if macro_name = unb.null_unbounded_string then
-  --     macro_wait_open := true;
-  --     open_pos := fix.index(s, "(");
-  --     if open_pos > 0 then
-  --       set_macro_name(s(s'first..(open_pos - 1)));
-  --     else
-  --       set_macro_name(s);
-  --       return (ptr => parse_macros'access);
-  --     end if;
-  --   end if;
-
-  --   if macro_wait_open then
-  --     if s(open_pos) /= '(' then
-  --       error_parse("wait '(' but: " & s);
-  --     end if;
-  --     macro_wait_open := false;
-  --     inc(open_pos);
-  --   end if;
     if get_macros_name_params(s) then
       getter.macros.define(unb.to_string(macro_name), unb.to_string(macro_params));
       macro_name := unb.null_unbounded_string;
@@ -345,23 +330,16 @@ procedure a0xfa is
       return (ptr => parse_main'access);
     end if;
     return (ptr => parse_macros'access);
-  --   if endswith(s, ')') then
-  --     if s'length > 1 then
-  --       append_param(s(open_pos..(s'last - 1)));
-  --     end if;
-  --     getter.macros.define(unb.to_string(macro_name), unb.to_string(macro_params));
-  --     return (ptr => parse_main'access);
-  --   else
-  --     append_param(s(open_pos..s'last));
-  --   end if;
-
-  --   return (ptr => parse_macros'access);
   end parse_macros;
 
   function parse_instruction (s : string) return record_handler_type is
   begin
     if s = ".def" then
       return (ptr => parse_def'access);
+    elsif s = ".undef" then
+      return (ptr => parse_undef'access);
+    elsif s = ".set" then
+      return (ptr => parse_set'access);
     elsif s = ".include" then
       return (ptr => parse_include'access);
     elsif s = ".for" then
@@ -450,7 +428,6 @@ procedure a0xfa is
     tmp_operation : operation_t;
     k_priority : natural := 0;
   begin
-    -- print(s);
     while i < s'last + 1 loop
       if s(i) in '0'..'9'|'a'..'z'|'_' then
         if start_pos = end_pos then
@@ -481,7 +458,6 @@ procedure a0xfa is
           end if;
 
           if s(i) = ';' then
-            -- print(start_pos'img & end_pos'img & i'img);
             exit;
           elsif s(i) = '<' then
             if s(i + 1) /= '<' then

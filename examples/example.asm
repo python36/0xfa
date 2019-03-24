@@ -5,7 +5,7 @@
 
 ; instructions:
 
-.include "boards/msp430g2553.inc"
+.include "mcu/msp430g2553.inc"
 
 .def var0 1 ; word type
 
@@ -13,6 +13,13 @@
   var1 10 ; word type
   var2 3 ; word type
 .end_defs
+.def var2 4 ; warning
+
+.def var00 0
+.undef var00
+.undef var000 ; warning
+
+.set var2 {2 << 4}
 
 .macro m1(param1 param2)
   add {param1 + param2}, r4
@@ -39,7 +46,7 @@ label:
   ; >> <<
   ; & (and)
   ; ^ (xor)
-  ; | (or) ; lowest priority
+  ; | (or)
 
 ; example
 add {var0 * ((2 + var2) / 4) << 3}, r4

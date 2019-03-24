@@ -68,8 +68,8 @@
   ie1 0 ; .b
     wdtie  1
     ofie   2
-    nmie   {2**4}
-    accvie {2**5}
+    nmie   {2 ** 4}
+    accvie {2 ** 5}
   ie2 1 ; .b
     uca0rxie 1
     uca0txie 2

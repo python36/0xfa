@@ -1,4 +1,4 @@
-.include "boards/msp430g2553.inc"
+.include "mcu/msp430g2553.inc"
 
 .macro delay(cnt)
   mov #{cnt}, r8
@@ -6,6 +6,8 @@
   dec r8
   jnz delay_loop
 .end_macro
+
+.def mem_code 8
 
 {mem_code}:
   mov   #{mem_ram_end + 1}, r1 ; MUST HAVE

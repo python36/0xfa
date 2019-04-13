@@ -915,4 +915,54 @@
       bcsctl3_xt2of   {1 << bcsctl3_xt2of_pos}
     bcsctl3_lfxt1of_pos 0
       bcsctl3_lfxt1of {1 << bcsctl3_lfxt1of_pos}
+; comparator
+  cactl1 0x59 ; .b
+    cactl1_caex_pos   7
+      cactl1_caex   {1 << cactl1_caex_pos}
+    cactl1_carsel_pos 6
+      cactl1_carsel {1 << cactl1_carsel_pos}
+    cactl1_caref_pos  4
+      cactl1_caref  {1 << cactl1_caref_pos}
+    cactl1_caon_pos   3
+      cactl1_caon   {1 << cactl1_caon_pos}
+    cactl1_caies_pos  2
+      cactl1_caies  {1 << cactl1_caies_pos}
+    cactl1_caie_pos   1
+      cactl1_caie   {1 << cactl1_caie_pos}
+    cactl1_caifg_pos  0
+      cactl1_caifg  {1 << cactl1_caifg_pos}
+  cactl2 0x5a ; .b
+    cactl2_cashort_pos 7
+      cactl2_cashort {1 << cactl2_cashort_pos}
+    cactl2_p2ca4_pos   6
+      cactl2_p2ca4   {1 << cactl2_p2ca4_pos}
+    cactl2_p2ca3_pos   5
+      cactl2_p2ca3   {1 << cactl2_p2ca3_pos}
+    cactl2_p2ca2_pos   4
+      cactl2_p2ca2   {1 << cactl2_p2ca2_pos}
+    cactl2_p2ca1_pos   3
+      cactl2_p2ca1   {1 << cactl2_p2ca1_pos}
+    cactl2_p2ca0_pos   2
+      cactl2_p2ca0   {1 << cactl2_p2ca0_pos}
+    cactl2_caf_pos     1
+      cactl2_caf     {1 << cactl2_caf_pos}
+    cactl2_caout_pos   0
+      cactl2_caout   {1 << cactl2_caout_pos}
+  capd   0x5b ; .b
+    capd_capd7_pos 7
+      capd_capd7 {1 << capd_capd7}
+    capd_capd6_pos 6
+      capd_capd6 {1 << capd_capd6}
+    capd_capd5_pos 5
+      capd_capd5 {1 << capd_capd5}
+    capd_capd4_pos 4
+      capd_capd4 {1 << capd_capd4}
+    capd_capd3_pos 3
+      capd_capd3 {1 << capd_capd3}
+    capd_capd2_pos 2
+      capd_capd2 {1 << capd_capd2}
+    capd_capd1_pos 1
+      capd_capd1 {1 << capd_capd1}
+    capd_capd0_pos 0
+      capd_capd0 {1 << capd_capd0}
 .end_defs

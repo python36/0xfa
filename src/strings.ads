@@ -42,4 +42,7 @@ package strings is
 
   procedure void (s : string);
 
+  function "=" (us : unb.unbounded_string; s : string) return boolean;
+  function "=" (s : string; us : unb.unbounded_string) return boolean;
+
 end strings;

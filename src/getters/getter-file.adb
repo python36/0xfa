@@ -29,7 +29,11 @@ package body getter.file is
     ada.text_io.get_immediate(current_ptr.all, c);
     if c = ';' then
       ada.text_io.get_immediate(current_ptr.all, c);
-      while c /= ascii.lf and not ada.text_io.end_of_file(current_ptr.all) loop
+      while c /= ascii.lf loop
+        if ada.text_io.end_of_file(current_ptr.all) then
+          c := ' ';
+          exit;
+        end if;
         ada.text_io.get_immediate(current_ptr.all, c);
       end loop;
     end if;

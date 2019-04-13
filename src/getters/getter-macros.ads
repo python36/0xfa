@@ -9,9 +9,11 @@ with env; use env;
 package getter.macros is
   ERROR_NO_CLOSED : exception;
   ERROR_NO_DEFINED : exception;
+  ERROR_UNEXPECTED_NAME : exception;
   ERROR_PARAM : exception;
   ERROR_COUNT_PARAMS : exception;
   ERROR_ALREADY_DEFINED : exception;
+  ERROR_NONDEFAULT_AFTER_DEFAULT : exception;
 
   function get return character;
   procedure define (name, params : string);
@@ -22,12 +24,19 @@ private
 
   end_macros_statement : constant string := ".end_macro";
 
+  type param_t is record
+    name : unb.unbounded_string;
+    default_val : word := 0;
+    has_default : boolean := false;
+  end record;
+
   package params_t is new ada.containers.vectors(element_type => environment_t.cursor, index_type => natural, "=" => environment_t."=");
-  package param_names_t is new ada.containers.indefinite_vectors(element_type => string, index_type => natural);
+  package param_names_t is new ada.containers.indefinite_vectors(element_type => param_t, index_type => natural);
 
   type macros_t is record
     code : unb.unbounded_string;
     param_names : param_names_t.vector;
+    num_required_params : natural := 0;
     first_line : pos_count;
   end record;
 

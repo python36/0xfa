@@ -29,6 +29,8 @@ package body getter.macros is
     len_end : constant natural := end_macros_statement'length;
     start_pos : natural := 1;
     cur_pos : natural := 1;
+    mustbe_only_default : boolean := false;
+    t_param : param_t;
   begin
     loop
       c := getter.get(false);
@@ -53,10 +55,32 @@ package body getter.macros is
       c := params(i);
       if c in ' '|ascii.lf then
         if start_pos /= cur_pos then
-          if not validate_variable(params(start_pos..(cur_pos - 1))) then
-            raise ERROR_PARAM with params(start_pos..(cur_pos - 1));
-          end if;
-          tmp_macros.param_names.append(params(start_pos..(cur_pos - 1)));
+
+          declare
+            param : constant string := params(start_pos..(cur_pos - 1));
+            assignment_pos : natural := fix.index(param, "=");
+          begin
+            if assignment_pos > 0 then
+              mustbe_only_default := true;
+              if assignment_pos = param'last or assignment_pos = param'first or
+                  not validate_variable(param(param'first..(assignment_pos - 1))) or
+                  not validate_word(param((assignment_pos + 1)..param'last)) then
+                raise ERROR_PARAM with param;
+              end if;
+              t_param.name := unb.to_unbounded_string(param(param'first..(assignment_pos - 1)));
+              t_param.default_val := value(param((assignment_pos + 1)..param'last));
+              t_param.has_default := true;
+            elsif mustbe_only_default then
+              raise ERROR_NONDEFAULT_AFTER_DEFAULT with param;
+            elsif not validate_variable(param) then
+              raise ERROR_PARAM with param;
+            else
+              inc(tmp_macros.num_required_params);
+              t_param.name := unb.to_unbounded_string(param);
+            end if;
+          end;
+
+          tmp_macros.param_names.append(t_param);
         end if;
         start_pos := cur_pos + 1;
       end if;
@@ -71,6 +95,10 @@ package body getter.macros is
     param_i : param_names_t.cursor;
     tmp_env_cur : environment_t.cursor;
     tb : boolean;
+    num_req : natural;
+    tmp_n : natural;
+    mustbe_only_default : boolean := false;
+    t_param : param_t;
   begin
     if not macroses_t.contains(macroses, name) then
       raise ERROR_NO_DEFINED;
@@ -85,23 +113,76 @@ package body getter.macros is
     current_called.params.clear;
     current_called.macros_cursor := macroses_t.find(macroses, name);
     current_macros := macroses_t.element(current_called.macros_cursor);
+    num_req := current_macros.num_required_params;
     stack.append(current_called);
-
-    if fix.count(params, " ") /= natural(param_names_t.length(current_macros.param_names)) then
-      raise ERROR_COUNT_PARAMS;
-    end if;
 
     param_i := param_names_t.first(current_macros.param_names);
     for i in params'range loop
       if params(i) = ' ' then
-        environment.insert(param_names_t.element(param_i), value(params(t_i..i)), tmp_env_cur, tb);
-        if not tb then
-          raise ERROR_ALREADY_DEFINED;
-        end if;
+        declare
+          param_raw : constant string := params(t_i..i);
+          assignment_pos : natural := fix.index(param_raw, "=");
+          name : constant string := param_raw(param_raw'first..(assignment_pos - 1));
+          param : constant string := param_raw(natural'max((assignment_pos + 1), param_raw'first)..param_raw'last);
+        begin
+          if assignment_pos > 0 then
+            if assignment_pos = param_raw'first or assignment_pos = param_raw'last then
+              raise ERROR_PARAM with param;
+            end if;
+            mustbe_only_default := true;
+
+            param_i := param_names_t.first(current_macros.param_names);
+            while param_names_t.has_element(param_i) loop
+              t_param := param_names_t.element(param_i);
+              if t_param.name = name then
+                if not t_param.has_default then
+                  if num_req = 0 then
+                    raise ERROR_COUNT_PARAMS with params;
+                  end if;
+                  dec(num_req);
+                end if;
+                exit;
+              end if;
+              param_names_t.next(param_i);
+            end loop;
+            if not param_names_t.has_element(param_i) then
+              raise ERROR_UNEXPECTED_NAME with name;
+            end if;
+            environment.insert(name, value(param), tmp_env_cur, tb);
+          elsif mustbe_only_default then
+            raise ERROR_NONDEFAULT_AFTER_DEFAULT with params;
+          else
+            if num_req > 0 then
+              dec(num_req);
+            end if;
+            environment.insert(unb.to_string(param_names_t.element(param_i).name), value(param), tmp_env_cur, tb);
+            param_names_t.next(param_i);
+          end if;
+
+          if not tb then
+            raise ERROR_ALREADY_DEFINED;
+          end if;
+        end;
+
         current_called.params.append(tmp_env_cur);
-        param_names_t.next(param_i);
         t_i := i + 1;
       end if;
+    end loop;
+
+    if num_req > 0 then
+      raise ERROR_COUNT_PARAMS with params;
+    end if;
+
+    param_i := param_names_t.first(current_macros.param_names);
+    while param_names_t.has_element(param_i) loop
+      t_param := param_names_t.element(param_i);
+      if t_param.has_default then
+        environment.insert(unb.to_string(param_names_t.element(param_i).name), t_param.default_val, tmp_env_cur, tb);
+        if tb then
+          current_called.params.append(tmp_env_cur);
+        end if;
+      end if;
+      param_names_t.next(param_i);
     end loop;
 
     getter.push(get'access);

@@ -120,4 +120,14 @@ package body strings is
     null;
   end void;
 
+  function "=" (us : unb.unbounded_string; s : string) return boolean is
+  begin
+    return unb.to_string(us) = s;
+  end "=";
+
+  function "=" (s : string; us : unb.unbounded_string) return boolean is
+  begin
+    return unb.to_string(us) = s;
+  end "=";
+
 end strings;

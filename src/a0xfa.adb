@@ -63,17 +63,16 @@ procedure a0xfa is
 
   parse_def_cursor : environment_t.cursor := environment_t.no_element;
 
+  package operands_t is new ada.containers.doubly_linked_lists(word, "=");
+
   type operation_t is record
     operation_ptr : operation_access := words_add'access;
     priority : positive := 1;
-    operand_pos : natural;
+    operand_cur : operands_t.cursor;
   end record;
 
   package operations_t is new ada.containers.vectors(
     element_type => operation_t, index_type => natural);
-
-  package operands_t is new ada.containers.vectors(
-    element_type => word, index_type => natural);
 
   function ">" (a, b : operation_t) return boolean is
   begin
@@ -424,7 +423,7 @@ procedure a0xfa is
     i : natural := s'first;
     priority : positive;
     operations : operations_t.vector;
-    operands : operands_t.vector;
+    operands : operands_t.list;
     tmp_operation : operation_t;
     k_priority : natural := 0;
   begin
@@ -451,6 +450,7 @@ procedure a0xfa is
           k_priority := k_priority - 10;
         elsif start_pos /= end_pos then
           if s(start_pos) in 'a'..'z' then
+            -- print(s(start_pos..(end_pos - 1)) & get_var_val(s(start_pos..(end_pos - 1)))'img);
             operands.append(get_var_val(s(start_pos..(end_pos - 1))));
           else
             -- print(s(start_pos..(end_pos - 1)));
@@ -506,7 +506,8 @@ procedure a0xfa is
           else
             error_parse(s & " unknown operation");
           end if;
-          insert_sorted(operations, (operation, priority, operands.last_index));
+          -- print(" = " & operands_t.element(operands, operands.last_index)'img);
+          insert_sorted(operations, (operation, priority, operands.last));
           start_pos := end_pos;
         else
           error_parse(s & " error");
@@ -521,13 +522,13 @@ procedure a0xfa is
     if operations_t.length(operations) = 0 and operands_t.length(operands) = 1 then
       return ltrim(operands_t.first_element(operands)'img);
     end if;
-    while operations_t.length(operations) > 0 loop
+    while not operations_t.is_empty(operations) loop
       tmp_operation := operations_t.first_element(operations);
       value := tmp_operation.operation_ptr.all(
-        operands_t.element(operands, tmp_operation.operand_pos),
-        operands_t.element(operands, tmp_operation.operand_pos + 1));
-      operands_t.replace_element(operands, tmp_operation.operand_pos, value);
-      operands_t.replace_element(operands, tmp_operation.operand_pos + 1, value);
+        operands_t.element(tmp_operation.operand_cur),
+        operands_t.element(operands_t.next(tmp_operation.operand_cur)));
+      operands_t.replace_element(operands, operands_t.next(tmp_operation.operand_cur), value);
+      operands.delete(tmp_operation.operand_cur);
       operations_t.delete_first(operations);
     end loop;
 

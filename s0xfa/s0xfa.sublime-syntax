@@ -1,0 +1,109 @@
+%YAML 1.2
+---
+name: s0xfa
+file_extensions: [asm, inc]
+scope: source.asm
+
+variables:
+  variable: '(?:[a-zA-Z][0-9a-zA-Z|_]*)'
+  register: '(?:r[0-1]?[0-9])'
+  value: '(?:(?:0x[0-9a-fA-F]+)|(?:\-?[0-9]+))'
+  zero_command: '(?:reti|clrc|clrn|clrz|dint|eint|nop|ret|setc|setn|setz)'
+  single_command_w: '(?i:swpb|sxt|call)'
+  single_command_bw: '(?i:rrc|rra|push|clr)(?:\.b)?'
+  single_command: '(?:{{single_command_w}}|{{single_command_bw}})'
+  jump_command: '(?i:jne|jnz|jeq|jz|jnc|jlo|jc|jhs|jn|jge|jl|jmp)'
+  two_command: '(?i:mov|add|addc|subc|sub|cmp|dadd|bit|bic|bis|xor|and)(?:\.b)?'
+  source: '{{variable}}|(?:\&{{variable}})|(?:[\$|\&]{{value}})|{{value}}|(?:\@{{register}}\+?)|(?:\#{{value}})|(?:{{register}})|(?:\-?[0-9]+\({{register}}\))'
+
+contexts:
+  main:
+    - match: \b({{single_command}})(?=\s+{{source}}\s)
+      scope: keyword
+    - match: \b({{jump_command}})\s+((?:{{variable}})|(?:\&{{variable}})|(?:\${{value}})|{{value}})\s
+      captures:
+        1: keyword
+        # 2: comment
+    - match: \b({{two_command}})\b
+      scope: entity.name.tag
+    - match: '{'
+      push: instruction
+    # - match: \s(\#[0-9]*)(?=\,|\s|\{)
+    #   scope: constant.numeric
+    - match: ((?<=(\s|\,|\()\#){{value}}(?=\s|\,))
+      scope: constant.numeric
+    # - match: \s(\&[0-9]*)(?=\,|\s|\{)
+    #   scope: storage
+    # - match: \s(\&0x[0-9a-f]+)(?=\,|\s)\b
+    #   scope: storage
+    - match: \;.*
+      scope: comment
+    # - match: '(?<=\s|\,){{register}}\s'
+    #   scope: constant.language
+    - match: '({{variable}})(?=(\{[^\}]\})*\:\s)'
+      scope: entity.name.function
+    - match: '{{variable}}(?=\()'
+      scope: support.function
+    - match: (\.include)\s+(\"[a-zA-Z0-9|\.|\s|\/]+\")\s
+      captures:
+        1: storage.type
+        2: string
+    - match: (\.include)\s+(?!(\"[a-zA-Z0-9|\.|\s|\/]+\")\s)
+      captures:
+        1: invalid
+    - match: \.def ({{variable}})\s+({{value}})\s
+      scope: storage.type
+      captures:
+        1: entity.name.tag
+        2: entity.other.attribute-name
+    - match: \.def ({{variable}})\s+(?=\{)
+      scope: storage.type #support.function
+      captures:
+        1: entity.name.tag
+    - match: \.defs\s
+      scope: storage.type
+      push: defs
+    - match: (\.macro)\s+({{variable}})\s*\(
+      captures:
+        1: storage.type
+        2: entity.name.class
+      set: macro_params
+    # - match: \.end_macro\s
+    #   scope: storage.type
+
+  instruction:
+    - meta_scope: string.quoted.double.c
+    - match: '\{'
+      push: instruction
+    - match: '\b\s*(<<|>>|\+|\-|\*|\/|\%||\||\&|\^)\s*\b'
+      scope: keyword.control.asmm
+    - match: '\b{{value}}\b'
+      scope: constant.numeric
+    - match: '\}'
+      pop: true
+    - match: \;.*
+      scope: comment
+
+  defs:
+    - match: '{{variable}}(?=[\s|\{])'
+      scope: entity.name.constant
+    - match: ((?<=\s){{value}}(?=[\s|\{]))
+      scope: constant.numeric
+    - match: '\{'
+      push: instruction
+    # - match: ({{variable}})\s+(?=\{)
+    #   scope: support.function
+    #   captures:
+    #     1: entity.name.tag
+    - match: '\.end_defs'
+      scope: storage.type
+      pop: true
+    - match: \;.*
+      scope: comment
+
+  macro_params:
+    - match: '(?:({{variable}})\s*\,?\s*)'
+      captures:
+        1: variable.parameter
+    - match: \)
+      pop: true

@@ -55,9 +55,9 @@ add {var0 * ((2 + var2) / 4) << 3}, r4
 ; example:
 table: 1 2 4 8 16 32 64
 mov #table, r7
-add 4, r7
+add #4, r7
 mov @r7, r8
 msg: "hello world"
 mov #msg, r10
-add 4, r10
+add #4, r10
 mov '!', @r10

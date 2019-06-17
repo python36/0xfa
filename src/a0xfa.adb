@@ -17,6 +17,7 @@ with getter;
 with getter.file;
 with getter.for_loop;
 with getter.macros;
+with getter.high;
 
 with numbers; use numbers;
 with strings; use strings;
@@ -368,6 +369,7 @@ procedure a0xfa is
   function parse_label (s : string) return record_handler_type is
     tmp_word : word;
     label : label_t;
+    sl : unb.unbounded_string := unb.to_unbounded_string(s);
   begin
     if first_element(s) in '0'..'9' then
       tmp_word := parse_word(s);
@@ -380,6 +382,9 @@ procedure a0xfa is
       end if;
       programm_address := create(tmp_word);
     elsif first_element(s) in 'a'..'z' then
+      if last_element(s) = ':' then
+
+      end if;
       validate_variable_assert(s);
       if validate_register(s) then
         error_parse(s & " label can not be r0..15");
@@ -720,7 +725,7 @@ procedure a0xfa is
     end if;
     tmp_cursor := programm_t.next(tmp_cursor);
     if programm_t.has_element(tmp_cursor) then
-      if programm_t.key(tmp_cursor) <= programm_address then
+      if programm_t.key(tmp_cursor) < programm_address then
         error_parse("rewrite next command: " & hex(get(programm_address)));
       end if;
     end if;
@@ -904,9 +909,17 @@ procedure a0xfa is
 
   function parse_main (s : string) return record_handler_type is
   begin
-    if first_element(s) = '.' then
+    if first_element(s) = '`' then
+      getter.high.start(s);
+    elsif first_element(s) = '.' then
       return parse_instruction(s);
     elsif last_element(s) = ':' then
+      if local_env /= '' and s'length > 3 then
+        if last_element(s) /= ':' then
+          return parse_label(s(s'first..(s'last - 2)));
+        end if;
+        return parse_label(s(s'first..(s'last - 1)));
+      end if;
       return parse_label(s(s'first..(s'last - 1)));
     elsif first_element(s) in 'a'..'z' then
       if fix.index(s, "(") > 1 then

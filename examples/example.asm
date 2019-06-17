@@ -1,7 +1,7 @@
 ; its comment
 
 ; comma ~ space
-; mov r1,r2 ~ mov,r1,r2 ~ mov r1 r2 ~ mov,r1 r2
+; mov r1, r2 ~ mov,r1,r2 ~ mov r1 r2 ~ mov,r1 r2
 
 ; instructions:
 

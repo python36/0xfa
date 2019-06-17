@@ -120,7 +120,7 @@ package body getter.macros is
     for i in params'range loop
       if params(i) = ' ' then
         declare
-          param_raw : constant string := params(t_i..i - 1);
+          param_raw : constant string := params(t_i..i-1);
           assignment_pos : natural := fix.index(param_raw, "=");
           name : constant string := param_raw(param_raw'first..(assignment_pos - 1));
           param : constant string := param_raw(natural'max((assignment_pos + 1), param_raw'first)..param_raw'last);

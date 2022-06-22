@@ -382,9 +382,6 @@ procedure a0xfa is
       end if;
       programm_address := create(tmp_word);
     elsif first_element(s) in 'a'..'z' then
-      if last_element(s) = ':' then
-
-      end if;
       validate_variable_assert(s);
       if validate_register(s) then
         error_parse(s & " label can not be r0..15");
@@ -914,7 +911,7 @@ procedure a0xfa is
     elsif first_element(s) = '.' then
       return parse_instruction(s);
     elsif last_element(s) = ':' then
-      if local_env /= '' and s'length > 3 then
+      if s'length > 3 then
         if last_element(s) /= ':' then
           return parse_label(s(s'first..(s'last - 2)));
         end if;

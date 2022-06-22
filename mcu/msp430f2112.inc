@@ -1,6 +1,6 @@
 .defs
 ; memory map
-  mem_code     0xc000
+  mem_code     0xf800
   mem_code_end 0xffbf
 ;; info
   mem_info     0x1000
@@ -16,7 +16,7 @@
   mem_info_segment_d_end 0x1040
 ;; ram
   mem_ram      0x200
-  mem_ram_end  0x3ff
+  mem_ram_end  0x2ff
 ; pins
   pin0 1
   pin1 2
@@ -540,7 +540,6 @@
   p3dir  0x1a ; .b
   p3sel  0x1b ; .b
   p3ren  0x10 ; .b
-  p3sel2 0x43 ; .b
 ; usi
   ; usictl0  0x78 ; .b
   ;   usictl0_usipe7_pos   7

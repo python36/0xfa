@@ -1,6 +1,6 @@
 .defs
 ; memory map
-  mem_code     0xc000
+  mem_code     0xf800
   mem_code_end 0xffbf
 ;; info
   mem_info     0x1000
@@ -16,7 +16,7 @@
   mem_info_segment_d_end 0x1040
 ;; ram
   mem_ram      0x200
-  mem_ram_end  0x3ff
+  mem_ram_end  0x27f
 ; pins
   pin0 1
   pin1 2
@@ -37,28 +37,28 @@
   scg0   0x40
   scg1   0x80
 ; hardware multiplier
-  mul_mpy    0x130
-  mul_mpys   0x132
-  mul_mac    0x134
-  mul_macs   0x136
-  mul_op2    0x138
-  mul_reslo  0x13a
-  mul_reshi  0x13c
-  mul_sumext 0x13e
+  ; mul_mpy    0x130
+  ; mul_mpys   0x132
+  ; mul_mac    0x134
+  ; mul_macs   0x136
+  ; mul_op2    0x138
+  ; mul_reslo  0x13a
+  ; mul_reshi  0x13c
+  ; mul_sumext 0x13e
 ; interrupt vectors
   reset_vector       0xfffe ; highest priority
   nmi_vector         0xfffc
-  timer1_a0_vector   0xfffa
-  timer1_a1_vector   0xfff8
-  comparatora_vector 0xfff6
+  ; timer1_a0_vector   0xfffa
+  ; timer1_a1_vector   0xfff8
+  ; comparatora_vector 0xfff6
   wdt_vector         0xfff4
   timer0_a0_vector   0xfff2
   timer0_a1_vector   0xfff0
-  usciab0rx_vector   0xffee
-  usciab0tx_vector   0xffec
+  ; usciab0rx_vector   0xffee
+  ; usciab0tx_vector   0xffec
   adc10_vector       0xffea
-  ; pass             0xffe8
-  port2_vector       0xffe6
+  usi_vector         0xffe8
+  ; port2_vector       0xffe6
   port1_vector       0xffe4
   ; pass             0xffe2
   ; pass             0xffe0
@@ -70,22 +70,22 @@
     ofie   2
     nmie   {2 ** 4}
     accvie {2 ** 5}
-  ie2 1 ; .b
-    uca0rxie 1
-    uca0txie 2
-    ucb0rxie 4
-    ucb0txie 8
+  ; ie2 1 ; .b
+  ;   uca0rxie 1
+  ;   uca0txie 2
+  ;   ucb0rxie 4
+  ;   ucb0txie 8
   ifg1 2 ; .b
     wdtifg 1
     ofifg  2
     porifg 4
     rstifg 8
     nmiifg 16
-  ifg2 3 ; .b
-    uca0rxifg 1
-    uca0txifg 2
-    ucb0rxifg 4
-    ucb0txifg 8
+  ; ifg2 3 ; .b
+  ;   uca0rxifg 1
+  ;   uca0txifg 2
+  ;   ucb0rxifg 4
+  ;   ucb0txifg 8
 ; calibration data
   tag_dco_30 0x10f6
     cal_bc1_1mhz_offset  9
@@ -104,23 +104,23 @@
     cal_dco_12mhz {tag_dco_30 + cal_dco_12mhz_offset}
     cal_bc1_16mhz {tag_dco_30 + cal_bc1_16mhz_offset}
     cal_dco_16mhz {tag_dco_30 + cal_dco_16mhz_offset}
-  tag_adc10_1 0x10da
-    cal_adc_25t85_offset         0x10
-    cal_adc_25t30_offset         0xe
-    cal_adc_25vref_factor_offset 0xc
-    cal_adc_15t85_offset         0xa
-    cal_adc_15t30_offset         8
-    cal_adc_15vref_factor_offset 6
-    cal_adc_offset_offset        4
-    cal_adc_gain_factor_offset   2
-    cal_adc_25t85         {tag_adc10_1 + cal_adc_25t85_offset}
-    cal_adc_25t30         {tag_adc10_1 + cal_adc_25t30_offset}
-    cal_adc_25vref_factor {tag_adc10_1 + cal_adc_25vref_factor_offset}
-    cal_adc_15t85         {tag_adc10_1 + cal_adc_15t85_offset}
-    cal_adc_15t30         {tag_adc10_1 + cal_adc_15t30_offset}
-    cal_adc_15vref_factor {tag_adc10_1 + cal_adc_15vref_factor_offset}
-    cal_adc_offset        {tag_adc10_1 + cal_adc_offset_offset}
-    cal_adc_gain_factor   {tag_adc10_1 + cal_adc_gain_factor_offset}
+  ; tag_adc10_1 0x10da
+  ;   cal_adc_25t85_offset         0x10
+  ;   cal_adc_25t30_offset         0xe
+  ;   cal_adc_25vref_factor_offset 0xc
+  ;   cal_adc_15t85_offset         0xa
+  ;   cal_adc_15t30_offset         8
+  ;   cal_adc_15vref_factor_offset 6
+  ;   cal_adc_offset_offset        4
+  ;   cal_adc_gain_factor_offset   2
+  ;   cal_adc_25t85         {tag_adc10_1 + cal_adc_25t85_offset}
+  ;   cal_adc_25t30         {tag_adc10_1 + cal_adc_25t30_offset}
+  ;   cal_adc_25vref_factor {tag_adc10_1 + cal_adc_25vref_factor_offset}
+  ;   cal_adc_15t85         {tag_adc10_1 + cal_adc_15t85_offset}
+  ;   cal_adc_15t30         {tag_adc10_1 + cal_adc_15t30_offset}
+  ;   cal_adc_15vref_factor {tag_adc10_1 + cal_adc_15vref_factor_offset}
+  ;   cal_adc_offset        {tag_adc10_1 + cal_adc_offset_offset}
+  ;   cal_adc_gain_factor   {tag_adc10_1 + cal_adc_gain_factor_offset}
 ; timers
   ;tactl
     tactl_tassel_pos 8
@@ -185,21 +185,20 @@
   ta0ctl   0x160
   ta0cctl0 0x162
   ta0cctl1 0x164
-  ta0cctl2 0x166
   ta0r     0x170
   ta0ccr0  0x172
   ta0ccr1  0x174
-  ta0ccr2  0x176
+  ; ta0ccr2  0x176
 ; timer1_a3
-  ta1iv    0x11e
-  ta1ctl   0x180
-  ta1cctl0 0x182
-  ta1cctl1 0x184
-  ta1cctl2 0x186
-  ta1r     0x190
-  ta1ccr0  0x192
-  ta1ccr1  0x194
-  ta1ccr2  0x196
+  ; ta1iv    0x11e
+  ; ta1ctl   0x180
+  ; ta1cctl0 0x182
+  ; ta1cctl1 0x184
+  ; ta1cctl2 0x186
+  ; ta1r     0x190
+  ; ta1ccr0  0x192
+  ; ta1ccr1  0x194
+  ; ta1ccr2  0x196
 ; adc10
   adc10ctl0 0x1b0
     adc10ctl0_sref_pos     13
@@ -299,7 +298,7 @@
       adc10dtc0_adc10fetch 1
   adc10dtc1 0x49 ; .b
   adc10ae0  0x4a ; .b
-  adc10ae1  0x4b ; .b
+  ; adc10ae1  0x4b ; .b
 ; supervisor
   svsctl 0x56
     svsctl_vld_pos   4
@@ -523,127 +522,127 @@
   p1ie   0x25 ; .b
   p1sel  0x26 ; .b
   p1ren  0x27 ; .b
-  p1sel2 0x41 ; .b
+  ; p1sel2 0x41 ; .b
 ; port p2
-  p2in   0x28 ; .b
-  p2out  0x29 ; .b
-  p2dir  0x2a ; .b
-  p2ifg  0x2b ; .b
-  p2ies  0x2c ; .b
-  p2ie   0x2d ; .b
-  p2sel  0x2e ; .b
-  p2ren  0x2f ; .b
-  p2sel2 0x42 ; .b
+;   p2in   0x28 ; .b
+;   p2out  0x29 ; .b
+;   p2dir  0x2a ; .b
+;   p2ifg  0x2b ; .b
+;   p2ies  0x2c ; .b
+;   p2ie   0x2d ; .b
+;   p2sel  0x2e ; .b
+;   p2ren  0x2f ; .b
+;   p2sel2 0x42 ; .b
 ; port p3
-  p3in   0x18 ; .b
-  p3out  0x19 ; .b
-  p3dir  0x1a ; .b
-  p3sel  0x1b ; .b
-  p3ren  0x10 ; .b
-  p3sel2 0x43 ; .b
+;   p3in   0x18 ; .b
+;   p3out  0x19 ; .b
+;   p3dir  0x1a ; .b
+;   p3sel  0x1b ; .b
+;   p3ren  0x10 ; .b
+;   p3sel2 0x43 ; .b
 ; usi
-  ; usictl0  0x78 ; .b
-  ;   usictl0_usipe7_pos   7
-  ;     usictl0_usipe7 {1 << usictl0_usipe7_pos}
-  ;   usictl0_usipe6_pos   6
-  ;     usictl0_usipe6 {1 << usictl0_usipe6_pos}
-  ;   usictl0_usipe5_pos   5
-  ;     usictl0_usipe5 {1 << usictl0_usipe5_pos}
-  ;   usictl0_usilsb_pos   4
-  ;     usictl0_usilsb {1 << usictl0_usilsb_pos}
-  ;   usictl0_usimst_pos   3
-  ;     usictl0_usimst {1 << usictl0_usimst_pos}
-  ;   usictl0_usige_pos    2
-  ;     usictl0_usige {1 << usictl0_usige_pos}
-  ;   usictl0_usioe_pos    1
-  ;     usictl0_usioe {1 << usictl0_usioe_pos}
-  ;   usictl0_usiswrst_pos 0
-  ;     usictl0_usiswrst {1 << usictl0_usiswrst_pos}
-  ; usictl1  0x79 ; .b
-  ;   usictl1_usickph_pos   7
-  ;     usictl1_usickph {1 << usictl1_usickph_pos}
-  ;   usictl1_usii2c_pos    6
-  ;     usictl1_usii2c {1 << usictl1_usii2c_pos}
-  ;   usictl1_usisttie_pos  5
-  ;     usictl1_usisttie {1 << usictl1_usisttie_pos}
-  ;   usictl1_usiie_pos     4
-  ;     usictl1_usiie {1 << usictl1_usiie_pos}
-  ;   usictl1_usial_pos     3
-  ;     usictl1_usial {1 << usictl1_usial_pos}
-  ;   usictl1_usistp_pos    2
-  ;     usictl1_usistp {1 << usictl1_usistp_pos}
-  ;   usictl1_usisttifg_pos 1
-  ;     usictl1_usisttifg {1 << usictl1_usisttifg_pos}
-  ;   usictl1_usiifg_pos    0
-  ;     usictl1_usiifg {1 << usictl1_usiifg_pos}
-  ; usickctl 0x7a ; .b
-  ;   usickctl_usidiv_pos   5
-  ;     usickctl_usidiv_0 {0 << usickctl_usidiv_pos}
-  ;     usickctl_usidiv_1 {1 << usickctl_usidiv_pos}
-  ;     usickctl_usidiv_2 {2 << usickctl_usidiv_pos}
-  ;     usickctl_usidiv_3 {3 << usickctl_usidiv_pos}
-  ;     usickctl_usidiv_4 {4 << usickctl_usidiv_pos}
-  ;     usickctl_usidiv_5 {5 << usickctl_usidiv_pos}
-  ;     usickctl_usidiv_6 {6 << usickctl_usidiv_pos}
-  ;     usickctl_usidiv_7 {7 << usickctl_usidiv_pos}
-  ;   usickctl_usissel_pos  2
-  ;     usickctl_usissel_0 {0 << usickctl_usissel_pos}
-  ;     usickctl_usissel_1 {1 << usickctl_usissel_pos}
-  ;     usickctl_usissel_2 {2 << usickctl_usissel_pos}
-  ;     usickctl_usissel_3 {3 << usickctl_usissel_pos}
-  ;     usickctl_usissel_4 {4 << usickctl_usissel_pos}
-  ;     usickctl_usissel_5 {5 << usickctl_usissel_pos}
-  ;     usickctl_usissel_6 {6 << usickctl_usissel_pos}
-  ;     usickctl_usissel_7 {7 << usickctl_usissel_pos}
-  ;   usickctl_usickpl_pos  1
-  ;     usickctl_usickpl {1 << usickctl_usickpl_pos}
-  ;   usickctl_usiswclk_pos 0
-  ;     usickctl_usiswclk {1 << usickctl_usiswclk_pos}
-  ; usicnt   0x7b ; .b
-  ;   usicnt_usisclrel_pos 7
-  ;     usicnt_usisclrel {1 << usicnt_usisclrel_pos}
-  ;   usicnt_usi16b_pos    6
-  ;     usicnt_usi16b {1 << usicnt_usi16b_pos}
-  ;   usicnt_usiifgcc_pos  5
-  ;     usicnt_usiifgcc {1 << usicnt_usiifgcc_pos}
-  ;   usicnt_usicnt_pos    0
-  ;   .end_defs .for i in 0..31
-  ;     .def usicnt_usicnt_{i} {i << usicnt_usicnt_pos}
-  ;   .end_for .defs
-  ; usisrl   0x7c ; .b
-  ; usisrh   0x7d ; .b
-  ; usictl   0x78
-  ; usicctl  0x7a
-  ; usisr    0x7c
+  usictl0  0x78 ; .b
+    usictl0_usipe7_pos   7
+      usictl0_usipe7 {1 << usictl0_usipe7_pos}
+    usictl0_usipe6_pos   6
+      usictl0_usipe6 {1 << usictl0_usipe6_pos}
+    usictl0_usipe5_pos   5
+      usictl0_usipe5 {1 << usictl0_usipe5_pos}
+    usictl0_usilsb_pos   4
+      usictl0_usilsb {1 << usictl0_usilsb_pos}
+    usictl0_usimst_pos   3
+      usictl0_usimst {1 << usictl0_usimst_pos}
+    usictl0_usige_pos    2
+      usictl0_usige {1 << usictl0_usige_pos}
+    usictl0_usioe_pos    1
+      usictl0_usioe {1 << usictl0_usioe_pos}
+    usictl0_usiswrst_pos 0
+      usictl0_usiswrst {1 << usictl0_usiswrst_pos}
+  usictl1  0x79 ; .b
+    usictl1_usickph_pos   7
+      usictl1_usickph {1 << usictl1_usickph_pos}
+    usictl1_usii2c_pos    6
+      usictl1_usii2c {1 << usictl1_usii2c_pos}
+    usictl1_usisttie_pos  5
+      usictl1_usisttie {1 << usictl1_usisttie_pos}
+    usictl1_usiie_pos     4
+      usictl1_usiie {1 << usictl1_usiie_pos}
+    usictl1_usial_pos     3
+      usictl1_usial {1 << usictl1_usial_pos}
+    usictl1_usistp_pos    2
+      usictl1_usistp {1 << usictl1_usistp_pos}
+    usictl1_usisttifg_pos 1
+      usictl1_usisttifg {1 << usictl1_usisttifg_pos}
+    usictl1_usiifg_pos    0
+      usictl1_usiifg {1 << usictl1_usiifg_pos}
+  usickctl 0x7a ; .b
+    usickctl_usidiv_pos   5
+      usickctl_usidiv_0 {0 << usickctl_usidiv_pos}
+      usickctl_usidiv_1 {1 << usickctl_usidiv_pos}
+      usickctl_usidiv_2 {2 << usickctl_usidiv_pos}
+      usickctl_usidiv_3 {3 << usickctl_usidiv_pos}
+      usickctl_usidiv_4 {4 << usickctl_usidiv_pos}
+      usickctl_usidiv_5 {5 << usickctl_usidiv_pos}
+      usickctl_usidiv_6 {6 << usickctl_usidiv_pos}
+      usickctl_usidiv_7 {7 << usickctl_usidiv_pos}
+    usickctl_usissel_pos  2
+      usickctl_usissel_0 {0 << usickctl_usissel_pos}
+      usickctl_usissel_1 {1 << usickctl_usissel_pos}
+      usickctl_usissel_2 {2 << usickctl_usissel_pos}
+      usickctl_usissel_3 {3 << usickctl_usissel_pos}
+      usickctl_usissel_4 {4 << usickctl_usissel_pos}
+      usickctl_usissel_5 {5 << usickctl_usissel_pos}
+      usickctl_usissel_6 {6 << usickctl_usissel_pos}
+      usickctl_usissel_7 {7 << usickctl_usissel_pos}
+    usickctl_usickpl_pos  1
+      usickctl_usickpl {1 << usickctl_usickpl_pos}
+    usickctl_usiswclk_pos 0
+      usickctl_usiswclk {1 << usickctl_usiswclk_pos}
+  usicnt   0x7b ; .b
+    usicnt_usisclrel_pos 7
+      usicnt_usisclrel {1 << usicnt_usisclrel_pos}
+    usicnt_usi16b_pos    6
+      usicnt_usi16b {1 << usicnt_usi16b_pos}
+    usicnt_usiifgcc_pos  5
+      usicnt_usiifgcc {1 << usicnt_usiifgcc_pos}
+    usicnt_usicnt_pos    0
+    .end_defs .for i in 0..31
+      .def usicnt_usicnt_{i} {i << usicnt_usicnt_pos}
+    .end_for .defs
+  usisrl   0x7c ; .b
+  usisrh   0x7d ; .b
+  usictl   0x78
+  usicctl  0x7a
+  usisr    0x7c
 ; spi
-  ucb0mctl   0x6c ; .b
+;   ucb0mctl   0x6c ; .b
 
-  ucactl0_ckpl_pos 6
-    ucactl0_ckpl {1 << ucactl0_ckpl_pos}
-  ucactl0_ckph_pos 7
-    ucactl0_ckph {1 << ucactl0_ckph_pos}
-  ucactl0_ucmst_pos   3
-    ucactl0_ucmst {1 << ucactl0_ucmst_pos}
-  ucbctl0_ckpl_pos 6
-    ucbctl0_ckpl {1 << ucactl0_ckpl_pos}
-  ucbctl0_ckph_pos 7
-    ucbctl0_ckph {1 << ucactl0_ckph_pos}
-  ucbctl0_uc7bit_pos 4
-    ucbctl0_uc7bit {1 << ucbctl0_uc7bit_pos}
-  ucbctl0_ucmsb_pos  5
-    ucbctl0_ucmsb {1 << ucbctl0_ucmsb_pos}
-; uart
-  uca0ctl0   0x60 ; .b
-  uca0ctl1   0x61 ; .b
-  uca0br0    0x62 ; .b
-  uca0br1    0x63 ; .b
-  uca0mctl   0x64 ; .b
-  uca0stat   0x65 ; .b
-  uca0rxbuf  0x66 ; .b
-  uca0txbuf  0x67 ; .b
-  uca0abctl  0x5d ; .b
-  uca0irtctl 0x5e ; .b
-  uca0irrctl 0x5f ; .b
+;   ucactl0_ckpl_pos 6
+;     ucactl0_ckpl {1 << ucactl0_ckpl_pos}
+;   ucactl0_ckph_pos 7
+;     ucactl0_ckph {1 << ucactl0_ckph_pos}
+;   ucactl0_ucmst_pos   3
+;     ucactl0_ucmst {1 << ucactl0_ucmst_pos}
+;   ucbctl0_ckpl_pos 6
+;     ucbctl0_ckpl {1 << ucactl0_ckpl_pos}
+;   ucbctl0_ckph_pos 7
+;     ucbctl0_ckph {1 << ucactl0_ckph_pos}
+;   ucbctl0_uc7bit_pos 4
+;     ucbctl0_uc7bit {1 << ucbctl0_uc7bit_pos}
+;   ucbctl0_ucmsb_pos  5
+;     ucbctl0_ucmsb {1 << ucbctl0_ucmsb_pos}
+; ; uart
+;   uca0ctl0   0x60 ; .b
+;   uca0ctl1   0x61 ; .b
+;   uca0br0    0x62 ; .b
+;   uca0br1    0x63 ; .b
+;   uca0mctl   0x64 ; .b
+;   uca0stat   0x65 ; .b
+;   uca0rxbuf  0x66 ; .b
+;   uca0txbuf  0x67 ; .b
+;   uca0abctl  0x5d ; .b
+;   uca0irtctl 0x5e ; .b
+;   uca0irrctl 0x5f ; .b
   ; not used in msp430g2553
   ; uca1ctl0   0xd0 ; .b
   ; uca1ctl1   0xd1 ; .b
@@ -660,198 +659,198 @@
   ; uc1ifg     7    ; .b
   ;
   ; ucactl0
-    ucactl0_ucpen_pos  7  
-      ucactl0_ucpen {1 << ucactl0_ucpen_pos}
-    ucactl0_ucpar_pos  6
-      ucactl0_ucpar {1 << ucactl0_ucpar_pos}
-    ucactl0_ucmsb_pos  5
-      ucactl0_ucmsb {1 << ucactl0_ucmsb_pos}
-    ucactl0_uc7bit_pos 4
-      ucactl0_uc7bit {1 << ucactl0_uc7bit_pos}
-    ucactl0_ucspb_pos  3
-      ucactl0_ucspb {1 << ucactl0_ucspb_pos}
-    ucactl0_ucmode_pos 1
-      ucactl0_ucmode_0 {0 << ucactl0_ucmode_pos}
-      ucactl0_ucmode_1 {1 << ucactl0_ucmode_pos}
-      ucactl0_ucmode_2 {2 << ucactl0_ucmode_pos}
-      ucactl0_ucmode_3 {3 << ucactl0_ucmode_pos}
-    ucactl0_ucsync_pos 0
-      ucactl0_ucsync {1 << ucactl0_ucsync_pos}
-  ; ucactl1
-    ucactl1_ucssel_pos   6
-      ucactl1_ucssel_0 {0 << ucactl1_ucssel_pos}
-      ucactl1_ucssel_1 {1 << ucactl1_ucssel_pos}
-      ucactl1_ucssel_2 {2 << ucactl1_ucssel_pos}
-      ucactl1_ucssel_3 {3 << ucactl1_ucssel_pos}
-    ucactl1_ucrxeie_pos  5
-      ucactl1_ucrxeie {1 << ucactl1_ucrxeie_pos}
-    ucactl1_ucbrkie_pos  4
-      ucactl1_ucbrkie {1 << ucactl1_ucbrkie_pos}
-    ucactl1_ucdorm_pos   3
-      ucactl1_ucdorm {1 << ucactl1_ucdorm_pos}
-    ucactl1_uctxaddr_pos 2
-      ucactl1_uctxaddr {1 << ucactl1_uctxaddr_pos}
-    ucactl1_uctxbrk_pos  1
-      ucactl1_uctxbrk {1 << ucactl1_uctxbrk_pos}
-    ucactl1_ucswrst_pos  0
-      ucactl1_ucswrst {1 << ucactl1_ucswrst_pos}
-  ; ucamctl
-    ucamctl_ucbrf_pos  4
-      ucamctl_ucbrf_0  {0 << ucamctl_ucbrf_pos}
-      ucamctl_ucbrf_1  {1 << ucamctl_ucbrf_pos}
-      ucamctl_ucbrf_2  {2 << ucamctl_ucbrf_pos}
-      ucamctl_ucbrf_3  {3 << ucamctl_ucbrf_pos}
-      ucamctl_ucbrf_4  {4 << ucamctl_ucbrf_pos}
-      ucamctl_ucbrf_5  {5 << ucamctl_ucbrf_pos}
-      ucamctl_ucbrf_6  {6 << ucamctl_ucbrf_pos}
-      ucamctl_ucbrf_7  {7 << ucamctl_ucbrf_pos}
-      ucamctl_ucbrf_8  {8 << ucamctl_ucbrf_pos}
-      ucamctl_ucbrf_9  {9 << ucamctl_ucbrf_pos}
-      ucamctl_ucbrf_10 {10 << ucamctl_ucbrf_pos}
-      ucamctl_ucbrf_11 {11 << ucamctl_ucbrf_pos}
-      ucamctl_ucbrf_12 {12 << ucamctl_ucbrf_pos}
-      ucamctl_ucbrf_13 {13 << ucamctl_ucbrf_pos}
-      ucamctl_ucbrf_14 {14 << ucamctl_ucbrf_pos}
-      ucamctl_ucbrf_15 {15 << ucamctl_ucbrf_pos}
-    ucamctl_ucbrs_pos  1
-      ucamctl_ucbrs_0  {0 << ucamctl_ucbrs_pos}
-      ucamctl_ucbrs_1  {1 << ucamctl_ucbrs_pos}
-      ucamctl_ucbrs_2  {2 << ucamctl_ucbrs_pos}
-      ucamctl_ucbrs_3  {3 << ucamctl_ucbrs_pos}
-      ucamctl_ucbrs_4  {4 << ucamctl_ucbrs_pos}
-      ucamctl_ucbrs_5  {5 << ucamctl_ucbrs_pos}
-      ucamctl_ucbrs_6  {6 << ucamctl_ucbrs_pos}
-      ucamctl_ucbrs_7  {7 << ucamctl_ucbrs_pos}
-    ucamctl_ucos16_pos 0
-      ucamctl_ucos16 {1 << ucamctl_ucos16_pos}
-  ; ucastat
-    ucastat_uclisten_pos 7
-      ucastat_uclisten {1 << ucastat_uclisten_pos}
-    ucastat_ucfe_pos     6
-      ucastat_ucfe {1 << ucastat_ucfe_pos}
-    ucastat_ucoe_pos     5 
-      ucastat_ucoe {1 << ucastat_ucoe_pos}
-    ucastat_ucpe_pos     4
-      ucastat_ucpe {1 << ucastat_ucpe_pos}
-    ucastat_ucbrk_pos    3
-      ucastat_ucbrk {1 << ucastat_ucbrk_pos}
-    ucastat_ucrxerr_pos  2
-      ucastat_ucrxerr {1 << ucastat_ucrxerr_pos}
-    ucastat_ucaddr_pos   1
-      ucastat_ucaddr {1 << ucastat_ucaddr_pos}
-    ucastat_ucidle_pos {ucastat_ucaddr}
-      ucastat_ucidle {1 << ucastat_ucidle_pos}
-    ucastat_ucbusy_pos   0
-      ucastat_ucbusy {1 << ucastat_ucbusy_pos}
-  ; ucairtctl
-    ucairtctl_ucirtxpl_pos  2
-    .end_defs .for i in 0..63
-      .def ucairtctl_ucirtxpl_{i} {i << ucairtctl_ucirtxpl_pos}
-    .end_for .defs
-    ucairtctl_ucirtxclk_pos 1
-      ucairtctl_ucirtxclk {1 << ucairtctl_ucirtxclk_pos}
-    ucairtctl_uciren_pos    0
-      ucairtctl_uciren {1 << ucairtctl_uciren_pos}
-  ; ucairrctl
-    ucairrctl_ucirrxfl_pos 2
-    .end_defs .for i in 0..63
-      .def ucairrctl_ucirrxfl_{i} {i << ucairrctl_ucirrxfl_pos}
-    .end_for .defs
-    ucairrctl_ucirrxpl_pos 1
-      ucairrctl_ucirrxpl {1 << ucairrctl_ucirrxpl_pos}
-    ucairrctl_ucirrxfe_pos 0
-      ucairrctl_ucirrxfe {1 << ucairrctl_ucirrxfe_pos}
-  ; ucaabctl
-    ucaabctl_ucdelim_pos 4
-      ucaabctl_ucdelim_0 {0 << ucaabctl_ucdelim_pos}
-      ucaabctl_ucdelim_1 {1 << ucaabctl_ucdelim_pos}
-      ucaabctl_ucdelim_2 {2 << ucaabctl_ucdelim_pos}
-      ucaabctl_ucdelim_3 {3 << ucaabctl_ucdelim_pos}
-    ucaabctl_ucstoe_pos  3
-      ucaabctl_ucstoe {1 << ucaabctl_ucstoe_pos}
-    ucaabctl_ucbtor_pos  2
-      ucaabctl_ucbtor {1 << ucaabctl_ucbtor_pos}
-    ucaabctl_ucabden_pos 0
-      ucaabctl_ucabden {1 << ucaabctl_ucabden_pos}
-; i2c
-  ucb0ctl0  0x68
-  ucb0ctl1  0x69
-  ucb0br0   0x6a
-  ucb0br1   0x6b
-  ucb0i2cie 0x6c
-  ucb0stat  0x6d
-  ucb0rxbuf 0x6e
-  ucb0txbuf 0x6f
-  ucb0i2coa 0x118
-  ucb0i2csa 0x11a
-  ; not used in msp430g2553
-  ; ucb1ctl0
-  ; ucb1ctl1
-  ; ucb1br0
-  ; ucb1br1
-  ; ucb1i2cie
-  ; ucb1stat
-  ; ucb1rxbuf
-  ; ucb1txbuf
-  ; ucb1i2coa
-  ; ucb1i2csa
-  ;
-  ; ucbctl0
-    ucbctl0_uca10_pos   7
-      ucbctl0_uca10 {1 << ucbctl0_uca10_pos}
-    ucbctl0_ucsla10_pos 6
-      ucbctl0_ucsla10 {1 << ucbctl0_ucsla10_pos}
-    ucbctl0_ucmm_pos    5
-      ucbctl0_ucmm {1 << ucbctl0_ucmm_pos}
-    ucbctl0_ucmst_pos   3
-      ucbctl0_ucmst {1 << ucbctl0_ucmst_pos}
-    ucbctl0_ucmode_pos  1
-      ucbctl0_ucmode_0 {0 << ucbctl0_ucmode_pos}
-      ucbctl0_ucmode_1 {1 << ucbctl0_ucmode_pos}
-      ucbctl0_ucmode_2 {2 << ucbctl0_ucmode_pos}
-      ucbctl0_ucmode_3 {3 << ucbctl0_ucmode_pos}
-    ucbctl0_ucsync_pos  0
-      ucbctl0_ucsync {1 << ucbctl0_ucsync_pos}
-  ; ucbctl1
-    ucbctl1_ucssel_pos   6
-      ucbctl1_ucssel_0 {0 << ucbctl1_ucssel_pos}
-      ucbctl1_ucssel_1 {1 << ucbctl1_ucssel_pos}
-      ucbctl1_ucssel_2 {2 << ucbctl1_ucssel_pos}
-      ucbctl1_ucssel_3 {3 << ucbctl1_ucssel_pos}
-    ucbctl1_uctr_pos     4
-      ucbctl1_uctr {1 << ucbctl1_uctr_pos}
-    ucbctl1_uctxnack_pos 3
-      ucbctl1_uctxnack {1 << ucbctl1_uctxnack_pos}
-    ucbctl1_uctxstp_pos  2
-      ucbctl1_uctxstp {1 << ucbctl1_uctxstp_pos}
-    ucbctl1_uctxstt_pos  1
-      ucbctl1_uctxstt {1 << ucbctl1_uctxstt_pos}
-    ucbctl1_ucswrst_pos  0
-      ucbctl1_ucswrst {1 << ucbctl1_ucswrst_pos}
-  ; ucbstat
-    ucbstat_ucscllow_pos  6
-      ucbstat_ucscllow {1 << ucbstat_ucscllow_pos}
-    ucbstat_ucgc_pos      5
-      ucbstat_ucgc {1 << ucbstat_ucgc_pos}
-    ucbstat_ucbbusy_pos   4
-      ucbstat_ucbbusy {1 << ucbstat_ucbbusy_pos}
-    ucbstat_ucnackifg_pos 3
-      ucbstat_ucnackifg {1 << ucbstat_ucnackifg_pos}
-    ucbstat_ucstpifg_pos  2
-      ucbstat_ucstpifg {1 << ucbstat_ucstpifg_pos}
-    ucbstat_ucsttifg_pos  1
-      ucbstat_ucsttifg {1 << ucbstat_ucsttifg_pos}
-    ucbstat_ucalifg_pos   0
-      ucbstat_ucalifg {1 << ucbstat_ucalifg_pos}
-  ; ucbi2coa
-    ucbi2coa_ucgen_pos 15
-      ucbi2coa_ucgen {1 << ucbi2coa_ucgen_pos}
-    ucbi2coa_i2coa_pos 0
-  ; ucbi2cie
-    ucbi2cie_ucnackie_pos 3
-    ucbi2cie_ucstpie_pos  2
-    ucbi2cie_ucsttie_pos  1
-    ucbi2cie_ucalie_pos   0
+;     ucactl0_ucpen_pos  7  
+;       ucactl0_ucpen {1 << ucactl0_ucpen_pos}
+;     ucactl0_ucpar_pos  6
+;       ucactl0_ucpar {1 << ucactl0_ucpar_pos}
+;     ucactl0_ucmsb_pos  5
+;       ucactl0_ucmsb {1 << ucactl0_ucmsb_pos}
+;     ucactl0_uc7bit_pos 4
+;       ucactl0_uc7bit {1 << ucactl0_uc7bit_pos}
+;     ucactl0_ucspb_pos  3
+;       ucactl0_ucspb {1 << ucactl0_ucspb_pos}
+;     ucactl0_ucmode_pos 1
+;       ucactl0_ucmode_0 {0 << ucactl0_ucmode_pos}
+;       ucactl0_ucmode_1 {1 << ucactl0_ucmode_pos}
+;       ucactl0_ucmode_2 {2 << ucactl0_ucmode_pos}
+;       ucactl0_ucmode_3 {3 << ucactl0_ucmode_pos}
+;     ucactl0_ucsync_pos 0
+;       ucactl0_ucsync {1 << ucactl0_ucsync_pos}
+;   ; ucactl1
+;     ucactl1_ucssel_pos   6
+;       ucactl1_ucssel_0 {0 << ucactl1_ucssel_pos}
+;       ucactl1_ucssel_1 {1 << ucactl1_ucssel_pos}
+;       ucactl1_ucssel_2 {2 << ucactl1_ucssel_pos}
+;       ucactl1_ucssel_3 {3 << ucactl1_ucssel_pos}
+;     ucactl1_ucrxeie_pos  5
+;       ucactl1_ucrxeie {1 << ucactl1_ucrxeie_pos}
+;     ucactl1_ucbrkie_pos  4
+;       ucactl1_ucbrkie {1 << ucactl1_ucbrkie_pos}
+;     ucactl1_ucdorm_pos   3
+;       ucactl1_ucdorm {1 << ucactl1_ucdorm_pos}
+;     ucactl1_uctxaddr_pos 2
+;       ucactl1_uctxaddr {1 << ucactl1_uctxaddr_pos}
+;     ucactl1_uctxbrk_pos  1
+;       ucactl1_uctxbrk {1 << ucactl1_uctxbrk_pos}
+;     ucactl1_ucswrst_pos  0
+;       ucactl1_ucswrst {1 << ucactl1_ucswrst_pos}
+;   ; ucamctl
+;     ucamctl_ucbrf_pos  4
+;       ucamctl_ucbrf_0  {0 << ucamctl_ucbrf_pos}
+;       ucamctl_ucbrf_1  {1 << ucamctl_ucbrf_pos}
+;       ucamctl_ucbrf_2  {2 << ucamctl_ucbrf_pos}
+;       ucamctl_ucbrf_3  {3 << ucamctl_ucbrf_pos}
+;       ucamctl_ucbrf_4  {4 << ucamctl_ucbrf_pos}
+;       ucamctl_ucbrf_5  {5 << ucamctl_ucbrf_pos}
+;       ucamctl_ucbrf_6  {6 << ucamctl_ucbrf_pos}
+;       ucamctl_ucbrf_7  {7 << ucamctl_ucbrf_pos}
+;       ucamctl_ucbrf_8  {8 << ucamctl_ucbrf_pos}
+;       ucamctl_ucbrf_9  {9 << ucamctl_ucbrf_pos}
+;       ucamctl_ucbrf_10 {10 << ucamctl_ucbrf_pos}
+;       ucamctl_ucbrf_11 {11 << ucamctl_ucbrf_pos}
+;       ucamctl_ucbrf_12 {12 << ucamctl_ucbrf_pos}
+;       ucamctl_ucbrf_13 {13 << ucamctl_ucbrf_pos}
+;       ucamctl_ucbrf_14 {14 << ucamctl_ucbrf_pos}
+;       ucamctl_ucbrf_15 {15 << ucamctl_ucbrf_pos}
+;     ucamctl_ucbrs_pos  1
+;       ucamctl_ucbrs_0  {0 << ucamctl_ucbrs_pos}
+;       ucamctl_ucbrs_1  {1 << ucamctl_ucbrs_pos}
+;       ucamctl_ucbrs_2  {2 << ucamctl_ucbrs_pos}
+;       ucamctl_ucbrs_3  {3 << ucamctl_ucbrs_pos}
+;       ucamctl_ucbrs_4  {4 << ucamctl_ucbrs_pos}
+;       ucamctl_ucbrs_5  {5 << ucamctl_ucbrs_pos}
+;       ucamctl_ucbrs_6  {6 << ucamctl_ucbrs_pos}
+;       ucamctl_ucbrs_7  {7 << ucamctl_ucbrs_pos}
+;     ucamctl_ucos16_pos 0
+;       ucamctl_ucos16 {1 << ucamctl_ucos16_pos}
+;   ; ucastat
+;     ucastat_uclisten_pos 7
+;       ucastat_uclisten {1 << ucastat_uclisten_pos}
+;     ucastat_ucfe_pos     6
+;       ucastat_ucfe {1 << ucastat_ucfe_pos}
+;     ucastat_ucoe_pos     5 
+;       ucastat_ucoe {1 << ucastat_ucoe_pos}
+;     ucastat_ucpe_pos     4
+;       ucastat_ucpe {1 << ucastat_ucpe_pos}
+;     ucastat_ucbrk_pos    3
+;       ucastat_ucbrk {1 << ucastat_ucbrk_pos}
+;     ucastat_ucrxerr_pos  2
+;       ucastat_ucrxerr {1 << ucastat_ucrxerr_pos}
+;     ucastat_ucaddr_pos   1
+;       ucastat_ucaddr {1 << ucastat_ucaddr_pos}
+;     ucastat_ucidle_pos {ucastat_ucaddr}
+;       ucastat_ucidle {1 << ucastat_ucidle_pos}
+;     ucastat_ucbusy_pos   0
+;       ucastat_ucbusy {1 << ucastat_ucbusy_pos}
+;   ; ucairtctl
+;     ucairtctl_ucirtxpl_pos  2
+;     .end_defs .for i in 0..63
+;       .def ucairtctl_ucirtxpl_{i} {i << ucairtctl_ucirtxpl_pos}
+;     .end_for .defs
+;     ucairtctl_ucirtxclk_pos 1
+;       ucairtctl_ucirtxclk {1 << ucairtctl_ucirtxclk_pos}
+;     ucairtctl_uciren_pos    0
+;       ucairtctl_uciren {1 << ucairtctl_uciren_pos}
+;   ; ucairrctl
+;     ucairrctl_ucirrxfl_pos 2
+;     .end_defs .for i in 0..63
+;       .def ucairrctl_ucirrxfl_{i} {i << ucairrctl_ucirrxfl_pos}
+;     .end_for .defs
+;     ucairrctl_ucirrxpl_pos 1
+;       ucairrctl_ucirrxpl {1 << ucairrctl_ucirrxpl_pos}
+;     ucairrctl_ucirrxfe_pos 0
+;       ucairrctl_ucirrxfe {1 << ucairrctl_ucirrxfe_pos}
+;   ; ucaabctl
+;     ucaabctl_ucdelim_pos 4
+;       ucaabctl_ucdelim_0 {0 << ucaabctl_ucdelim_pos}
+;       ucaabctl_ucdelim_1 {1 << ucaabctl_ucdelim_pos}
+;       ucaabctl_ucdelim_2 {2 << ucaabctl_ucdelim_pos}
+;       ucaabctl_ucdelim_3 {3 << ucaabctl_ucdelim_pos}
+;     ucaabctl_ucstoe_pos  3
+;       ucaabctl_ucstoe {1 << ucaabctl_ucstoe_pos}
+;     ucaabctl_ucbtor_pos  2
+;       ucaabctl_ucbtor {1 << ucaabctl_ucbtor_pos}
+;     ucaabctl_ucabden_pos 0
+;       ucaabctl_ucabden {1 << ucaabctl_ucabden_pos}
+; ; i2c
+;   ucb0ctl0  0x68
+;   ucb0ctl1  0x69
+;   ucb0br0   0x6a
+;   ucb0br1   0x6b
+;   ucb0i2cie 0x6c
+;   ucb0stat  0x6d
+;   ucb0rxbuf 0x6e
+;   ucb0txbuf 0x6f
+;   ucb0i2coa 0x118
+;   ucb0i2csa 0x11a
+;   ; not used in msp430g2553
+;   ; ucb1ctl0
+;   ; ucb1ctl1
+;   ; ucb1br0
+;   ; ucb1br1
+;   ; ucb1i2cie
+;   ; ucb1stat
+;   ; ucb1rxbuf
+;   ; ucb1txbuf
+;   ; ucb1i2coa
+;   ; ucb1i2csa
+;   ;
+;   ; ucbctl0
+;     ucbctl0_uca10_pos   7
+;       ucbctl0_uca10 {1 << ucbctl0_uca10_pos}
+;     ucbctl0_ucsla10_pos 6
+;       ucbctl0_ucsla10 {1 << ucbctl0_ucsla10_pos}
+;     ucbctl0_ucmm_pos    5
+;       ucbctl0_ucmm {1 << ucbctl0_ucmm_pos}
+;     ucbctl0_ucmst_pos   3
+;       ucbctl0_ucmst {1 << ucbctl0_ucmst_pos}
+;     ucbctl0_ucmode_pos  1
+;       ucbctl0_ucmode_0 {0 << ucbctl0_ucmode_pos}
+;       ucbctl0_ucmode_1 {1 << ucbctl0_ucmode_pos}
+;       ucbctl0_ucmode_2 {2 << ucbctl0_ucmode_pos}
+;       ucbctl0_ucmode_3 {3 << ucbctl0_ucmode_pos}
+;     ucbctl0_ucsync_pos  0
+;       ucbctl0_ucsync {1 << ucbctl0_ucsync_pos}
+;   ; ucbctl1
+;     ucbctl1_ucssel_pos   6
+;       ucbctl1_ucssel_0 {0 << ucbctl1_ucssel_pos}
+;       ucbctl1_ucssel_1 {1 << ucbctl1_ucssel_pos}
+;       ucbctl1_ucssel_2 {2 << ucbctl1_ucssel_pos}
+;       ucbctl1_ucssel_3 {3 << ucbctl1_ucssel_pos}
+;     ucbctl1_uctr_pos     4
+;       ucbctl1_uctr {1 << ucbctl1_uctr_pos}
+;     ucbctl1_uctxnack_pos 3
+;       ucbctl1_uctxnack {1 << ucbctl1_uctxnack_pos}
+;     ucbctl1_uctxstp_pos  2
+;       ucbctl1_uctxstp {1 << ucbctl1_uctxstp_pos}
+;     ucbctl1_uctxstt_pos  1
+;       ucbctl1_uctxstt {1 << ucbctl1_uctxstt_pos}
+;     ucbctl1_ucswrst_pos  0
+;       ucbctl1_ucswrst {1 << ucbctl1_ucswrst_pos}
+;   ; ucbstat
+;     ucbstat_ucscllow_pos  6
+;       ucbstat_ucscllow {1 << ucbstat_ucscllow_pos}
+;     ucbstat_ucgc_pos      5
+;       ucbstat_ucgc {1 << ucbstat_ucgc_pos}
+;     ucbstat_ucbbusy_pos   4
+;       ucbstat_ucbbusy {1 << ucbstat_ucbbusy_pos}
+;     ucbstat_ucnackifg_pos 3
+;       ucbstat_ucnackifg {1 << ucbstat_ucnackifg_pos}
+;     ucbstat_ucstpifg_pos  2
+;       ucbstat_ucstpifg {1 << ucbstat_ucstpifg_pos}
+;     ucbstat_ucsttifg_pos  1
+;       ucbstat_ucsttifg {1 << ucbstat_ucsttifg_pos}
+;     ucbstat_ucalifg_pos   0
+;       ucbstat_ucalifg {1 << ucbstat_ucalifg_pos}
+;   ; ucbi2coa
+;     ucbi2coa_ucgen_pos 15
+;       ucbi2coa_ucgen {1 << ucbi2coa_ucgen_pos}
+;     ucbi2coa_i2coa_pos 0
+;   ; ucbi2cie
+;     ucbi2cie_ucnackie_pos 3
+;     ucbi2cie_ucstpie_pos  2
+;     ucbi2cie_ucsttie_pos  1
+;     ucbi2cie_ucalie_pos   0
 ; basic clock system+
   dcoctl  0x56 ; .b
     dcoctl_dco_pos 5

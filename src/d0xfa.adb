@@ -579,10 +579,8 @@ begin
           addr := sl(addr, 8) + word(b);
           if next_addr > 0 and next_addr - word(op_l) * 2 /= addr then
             if op_l /= 0 then
-              print("WARNING! After address " & hex(next_addr - word(op_l) * 2) & " and previous command should be read as raw");
-              print("");
+              null;
               -- error("seq addrs");
-              op_l := 0;
             end if;
           end if;
           if op_l = 0 then

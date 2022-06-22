@@ -1,22 +1,22 @@
 .defs
 ; memory map
-  mem_code     0xc000
-  mem_code_end 0xffbf
+  mem_code     0xf100
+  mem_code_end 0xff7f
 ;; info
-  mem_info     0x1000
-  mem_info_end 0x10ff
+  ; mem_info     0x1000
+  ; mem_info_end 0x10ff
 
-  mem_info_segment_a     0x10c0
-  mem_info_segment_a_end 0x1100
-  mem_info_segment_b     0x1080
-  mem_info_segment_b_end 0x10c0
-  mem_info_segment_c     0x1040
-  mem_info_segment_c_end 0x1080
-  mem_info_segment_d     0x1000
-  mem_info_segment_d_end 0x1040
+  ; mem_info_segment_a     0x10c0
+  ; mem_info_segment_a_end 0x1100
+  ; mem_info_segment_b     0x1080
+  ; mem_info_segment_b_end 0x10c0
+  ; mem_info_segment_c     0x1040
+  ; mem_info_segment_c_end 0x1080
+  ; mem_info_segment_d     0x1000
+  ; mem_info_segment_d_end 0x1040
 ;; ram
-  mem_ram      0x200
-  mem_ram_end  0x3ff
+  mem_ram      0x2000
+  mem_ram_end  0x23ff
 ; pins
   pin0 1
   pin1 2
@@ -36,56 +36,234 @@
   oscoff 0x20
   scg0   0x40
   scg1   0x80
-; hardware multiplier
-  mul_mpy    0x130
-  mul_mpys   0x132
-  mul_mac    0x134
-  mul_macs   0x136
-  mul_op2    0x138
-  mul_reslo  0x13a
-  mul_reshi  0x13c
-  mul_sumext 0x13e
 ; interrupt vectors
   reset_vector       0xfffe ; highest priority
-  nmi_vector         0xfffc
-  timer1_a0_vector   0xfffa
-  timer1_a1_vector   0xfff8
-  comparatora_vector 0xfff6
-  wdt_vector         0xfff4
-  timer0_a0_vector   0xfff2
-  timer0_a1_vector   0xfff0
-  usciab0rx_vector   0xffee
-  usciab0tx_vector   0xffec
-  adc10_vector       0xffea
-  ; pass             0xffe8
-  port2_vector       0xffe6
-  port1_vector       0xffe4
-  ; pass             0xffe2
-  ; pass             0xffe0
-  bslskey            0xffde
-  ; not used         0xffda..0xffc0
+  sysnmi_vector      0xfffc
+  usernmi_vector     0xfffa
+  timer0_b0_vector   0xfff8
+  timer0_b1_vector   0xfff6
+  timer1_b0_vector   0xfff4
+  timer1_b1_vector   0xfff2
+  rtc_vector         0xfff0
+  wdt_vector         0xffee
+  uscia0_vector      0xffec
+  uscib0_vector      0xffea
+  adc10_vector       0xffe8
+  port1_vector       0xffe6
+  port2_vector       0xffe4
+  ecomp_vector       0xffe2
+; signatures
+  bsl_signature2     0xff86
+  bsl_signature1     0xff84
+  jtag_signature2    0xff82
+  jtag_signature1    0xff80
+; descriptors
+  cal_dco_16mhz_h 0x1a22
+  cal_dco_16mhz_l 0x1a23
+; sys
+  sysctl   0x140
+  sysbslc  0x142
+  sysjmbc  0x146
+  sysjmbi0 0x148
+  sysjmbi1 0x14a
+  sysjmbo0 0x14c
+  sysjmbo1 0x14e
+  sysuniv  0x15a
+  syssniv  0x15c
+  sysrstiv 0x15e
+  syscfg0  0x160
+  syscfg1  0x162
+  syscfg2  0x164
+; sfr
+  sfrie1  0x100
+  sfrefg1 0x102
+  sfrrpcr 0x104
+; pmm
+  pmmctl0 0x120
+  pmmctl1 0x122
+  pmmctl2 0x124
+  pmmifg  0x12a
+  pm4ctl0 0x130
+; cs
+  csctl0 0x180
+  csctl1 0x182
+  csctl2 0x184
+  csctl3 0x186
+  csctl4 0x188
+  csctl5 0x18a
+  csctl6 0x18c
+  csctl7 0x18e
+  csctl8 0x190
+; fram
+  frctl0 0x1a0
+  gcctl0 0x1a4
+  gcctl1 0x1a6
+; crc
+  crc16di   0x1c0
+  crcdirb   0x1c2
+  crcinires 0x1c4
+  crcresr   0x1c6
+; wdt
+  wdtctl 0x1cc
+; port p1
+  p1in   0x200
+  p1out  0x202
+  p1dir  0x204
+  p1ren  0x206
+  p1sel0 0x20a
+  p1sel1 0x20c
+  p1iv   0x20e
+  p1selc 0x216
+  p1ies  0x218
+  p1ie   0x21a
+  p1ifg  0x21c
+; port p2
+  p2in   0x201
+  p2out  0x203
+  p2dir  0x205
+  p2ren  0x207
+  p2sel0 0x20b
+  p2sel1 0x20d
+  p2selc 0x217
+  p2ies  0x219
+  p2ie   0x21b
+  p2ifg  0x21d
+  p2iv   0x21e
+; capacitive touch
+  capio0ctl 0x2e0
+; rtc
+  rtcctl 0x300
+  rtciv  0x304
+  rtcmod 0x308
+  rtccnt 0x30c
+; timer0_b3
+  tb0ctl   0x380
+  tb0cctl0 0x382
+  tb0cctl1 0x384
+  tb0cctl2 0x386
+  tb0r     0x390
+  tb0ccr0  0x392
+  tb0ccr1  0x394
+  tb0ccr2  0x396
+  tb0ex0   0x3a0
+  tb0iv    0x3ae
+; timer1_b3
+  tb1ctl   0x3c0
+  tb1cctl0 0x3c2
+  tb1cctl1 0x3c4
+  tb1cctl2 0x3c6
+  tb1r     0x3d0
+  tb1ccr0  0x3d2
+  tb1ccr1  0x3d4
+  tb1ccr2  0x3d6
+  tb1ex0   0x3e0
+  tb1iv    0x3ee
+; eusci_a0
+  uca0ctlw0  0x500
+  uca0ctlw1  0x502
+  uca0br0    0x506
+  uca0br1    0x507
+  uca0mctlw  0x508
+  uca0stat   0x50a
+  uca0rxbuf  0x50c
+  uca0txbuf  0x50e
+  uca0abctl  0x510
+  uca0irtctl 0x512
+  uca0irrctl 0x513
+  uca0ie     0x51a
+  uca0ifg    0x51c
+  uca0iv     0x51e
+; eusci_b0
+  ucb0ctlw0   0x540
+  ucb0ctlw1   0x542
+  ucb0br0     0x546
+  ucb0br1     0x547
+  ucb0statw   0x548
+  ucb0tbcnt   0x54a
+  ucb0rxbuf   0x54c
+  ucb0txbuf   0x54e
+  ucb0i2coa0  0x554
+  ucb0i2coa1  0x556
+  ucb0i2coa2  0x558
+  ucb0i2coa3  0x55a
+  ucb0addrx   0x55c
+  ucb0addmask 0x55e
+  ucb0i2csa   0x560
+  ucb0ie      0x56a
+  ucb0ifg     0x56c
+  ucb0iv      0x56e
+; backup memory
+  bakmem0  0x660
+  bakmem1  0x662
+  bakmem2  0x664
+  bakmem3  0x666
+  bakmem4  0x668
+  bakmem5  0x66a
+  bakmem6  0x66c
+  bakmem7  0x66e
+  bakmem8  0x670
+  bakmem9  0x672
+  bakmem10 0x674
+  bakmem11 0x676
+  bakmem12 0x678
+  bakmem13 0x67a
+  bakmem14 0x67c
+  bakmem15 0x67e
+; adc
+  adcctl0  0x700
+  adcctl1  0x702
+  adcctl2  0x704
+  adclo    0x706
+  adchi    0x708
+  adcmctl0 0x70a
+  adcmem0  0x712
+  adcie    0x71a
+  adcifg   0x71c
+  adciv    0x701e
+; comparator
+  cpctl0     0x8e0
+  cpctl1     0x8e2
+  cpint      0x8e6
+  cpiv       0x8e8
+  cpdatacctl 0x8f0
+  cpdacdata  0x8f2
+; sac0
+  sac0 0xc80
+; tia0
+  trictl 0xf00
+
+
+
+
+
+
+
+
+
+
+
 ; special function
-  ie1 0 ; .b
-    wdtie  1
-    ofie   2
-    nmie   {2 ** 4}
-    accvie {2 ** 5}
-  ie2 1 ; .b
-    uca0rxie 1
-    uca0txie 2
-    ucb0rxie 4
-    ucb0txie 8
-  ifg1 2 ; .b
-    wdtifg 1
-    ofifg  2
-    porifg 4
-    rstifg 8
-    nmiifg 16
-  ifg2 3 ; .b
-    uca0rxifg 1
-    uca0txifg 2
-    ucb0rxifg 4
-    ucb0txifg 8
+  ; ie1 0 ; .b
+  ;   wdtie  1
+  ;   ofie   2
+  ;   nmie   {2 ** 4}
+  ;   accvie {2 ** 5}
+  ; ie2 1 ; .b
+  ;   uca0rxie 1
+  ;   uca0txie 2
+  ;   ucb0rxie 4
+  ;   ucb0txie 8
+  ; ifg1 2 ; .b
+  ;   wdtifg 1
+  ;   ofifg  2
+  ;   porifg 4
+  ;   rstifg 8
+  ;   nmiifg 16
+  ; ifg2 3 ; .b
+  ;   uca0rxifg 1
+  ;   uca0txifg 2
+  ;   ucb0rxifg 4
+  ;   ucb0txifg 8
 ; calibration data
   tag_dco_30 0x10f6
     cal_bc1_1mhz_offset  9

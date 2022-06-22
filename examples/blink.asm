@@ -7,6 +7,8 @@
   jnz delay_loop
 .end_macro
 
+.def mem_code 8
+
 {mem_code}:
   mov   #{mem_ram_end + 1}, r1 ; MUST HAVE
 

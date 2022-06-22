@@ -1,0 +1,193 @@
+V "GNAT Lib v2021"
+A -gnat2012
+P SS ZX
+
+RN
+RV NO_DIRECT_BOOLEAN_OPERATORS
+RV NO_ENUMERATION_MAPS
+RV NO_EXCEPTION_HANDLERS
+RV NO_EXCEPTIONS
+RV NO_IO
+RV NO_IMPLICIT_CONDITIONALS
+RV NO_NESTED_FINALIZATION
+RV NO_SECONDARY_STACK
+RV NO_STANDARD_STORAGE_POOLS
+RV NO_DEFAULT_INITIALIZATION
+RV NO_DYNAMIC_SIZED_OBJECTS
+RV NO_ELABORATION_CODE
+RV NO_OBSOLESCENT_FEATURES
+
+U getter.high%b		getter-high.adb		fac2bb9c NE OO PK IL
+Z ada.exceptions%s	a-except.adb		a-except.ali
+Z ada.strings.text_buffers%s  a-sttebu.adb	a-sttebu.ali
+W getter%s		getter.adb		getter.ali
+Z system%s		system.ads		system.ali
+Z system.concat_2%s	s-conca2.adb		s-conca2.ali
+Z system.secondary_stack%s  s-secsta.adb	s-secsta.ali
+Z system.soft_links%s	s-soflin.adb		s-soflin.ali
+Z system.standard_library%s  s-stalib.adb	s-stalib.ali
+Z system.val_enum_8%s	s-vaenu8.ads		s-vaenu8.ali
+
+U getter.high%s		getter-high.ads		f76b3b2b EE OO PK IL
+Z ada.strings.text_buffers%s  a-sttebu.adb	a-sttebu.ali
+W env%s			env.adb			env.ali
+W getter%s		getter.adb		getter.ali
+W numbers%s		numbers.adb		numbers.ali
+W strings%s		strings.adb		strings.ali
+Z system%s		system.ads		system.ali
+Z system.exception_table%s  s-exctab.adb	s-exctab.ali
+Z system.standard_library%s  s-stalib.adb	s-stalib.ali
+
+D ada.ads		20210520051130 76789da1 ada%s
+D a-charac.ads		20210520051127 2d3ec45b ada.characters%s
+D a-chlat1.ads		20210520051127 66457d31 ada.characters.latin_1%s
+D a-contai.ads		20210520051127 61e5e089 ada.containers%s
+D a-conhel.ads		20210520051127 20298884 ada.containers.helpers%s
+D a-ciorma.ads		20210520051127 3aa5dad0 ada.containers.indefinite_ordered_maps%s
+D a-crbltr.ads		20210520051127 d3d16ba4 ada.containers.red_black_trees%s
+D a-convec.ads		20210520051127 5d39d84a ada.containers.vectors%s
+D a-except.ads		20210520051127 946f3014 ada.exceptions%s
+D a-finali.ads		20210520051127 bf4f806b ada.finalization%s
+D a-ioexce.ads		20210520051127 e4a01f64 ada.io_exceptions%s
+D a-iteint.ads		20210520051127 49a8bee2 ada.iterator_interfaces%s
+D a-numeri.ads		20210520051128 84bea7a3 ada.numerics%s
+D a-ngelfu.ads		20210520051128 e6ec3af5 ada.numerics.generic_elementary_functions%s
+D a-stream.ads		20210520051128 119b8fb3 ada.streams%s
+D a-string.ads		20210520051128 90ac6797 ada.strings%s
+D a-strfix.ads		20210520051128 aeacf44c ada.strings.fixed%s
+D a-strmap.ads		20210520051128 5a88892a ada.strings.maps%s
+D a-stmaco.ads		20210520051128 1c0e5368 ada.strings.maps.constants%s
+D a-sttebu.ads		20210520051128 18209c64 ada.strings.text_buffers%s
+D a-strunb.ads		20210520051128 03325227 ada.strings.unbounded%s
+D a-stuten.ads		20210520051128 808c40ad ada.strings.utf_encoding%s
+D a-tags.ads		20210520051129 9eaa38c6 ada.tags%s
+D a-textio.ads		20210520051129 aef4d56d ada.text_io%s
+D a-tiinio.ads		20210520051129 390edddb ada.text_io.integer_io%s
+D a-unccon.ads		20210520051129 0e9b276f ada.unchecked_conversion%s
+D env.ads		20220622145936 eb5b56a9 env%s
+D getter.ads		20220622145936 3026ec7f getter%s
+D getter-high.ads	20220622145936 e1c7f60b getter.high%s
+D getter-high.adb	20220622145936 1b054d97 getter.high%b
+D gnat.ads		20210520051131 b5988c27 gnat%s
+D g-regexp.ads		20210520051130 691be386 gnat.regexp%s
+D interfac.ads		20210520051131 edec285f interfaces%s
+D i-cstrea.ads		20210520051131 e53d8b8e interfaces.c_streams%s
+D numbers.ads		20220622145936 e373f4fc numbers%s
+D strings.ads		20220622145936 2ea2830a strings%s
+D system.ads		20210520051134 a2da961d system%s
+D s-atocou.ads		20210520051131 b45c2d8d system.atomic_counters%s
+D s-conca2.ads		20210520051131 02a0d7d0 system.concat_2%s
+D s-crtl.ads		20210520051131 0ebbdb71 system.crtl%s
+D s-exctab.ads		20210520051131 54135002 system.exception_table%s
+D s-ficobl.ads		20210520051131 078245e4 system.file_control_block%s
+D s-finmas.ads		20210520051131 1ab4dba8 system.finalization_masters%s
+D s-finroo.ads		20210520051131 4ff27390 system.finalization_root%s
+D s-memory.ads		20210520051132 597d6634 system.memory%s
+D s-parame.ads		20210520051133 4752c4cb system.parameters%s
+D s-putima.ads		20210520051133 4e095881 system.put_images%s
+D s-regexp.ads		20210520051133 9c7d27a7 system.regexp%s
+D s-secsta.ads		20210520051133 9b3ab94b system.secondary_stack%s
+D s-soflin.ads		20210520051133 a7318a92 system.soft_links%s
+D s-stache.ads		20210520051133 a37c21ec system.stack_checking%s
+D s-stalib.ads		20210520051133 472fbca8 system.standard_library%s
+D s-stalib.adb		20210520051133 977290bf system.standard_library%b
+D s-stoele.ads		20210520051133 2dc34a04 system.storage_elements%s
+D s-stoele.adb		20210520051133 ed88f8fb system.storage_elements%b
+D s-stopoo.ads		20210520051133 e9fa2dd8 system.storage_pools%s
+D s-stratt.ads		20210520051133 7bdda3fa system.stream_attributes%s
+D s-traent.ads		20210520051133 26a8d361 system.traceback_entries%s
+D s-unstyp.ads		20210520051133 2b077493 system.unsigned_types%s
+D s-vaenu8.ads		20210520051133 b7b91426 system.val_enum_8%s
+D s-valuen.ads		20210520051133 72b74993 system.value_n%s
+D s-wchcon.ads		20210520051134 1b7d22d2 system.wch_con%s
+D unchconv.ads		20210520051134 ca2f9e18 unchecked_conversion%s
+G a e
+G c Z s b [get getter__high 9 12 none]
+G c Z s b [start getter__high 10 13 none]
+G c Z s b [is_type getter__high 17 12 none]
+G c Z b b [get_word getter__high 9 12 none]
+G c Z b b [process getter__high 37 13 none]
+G r c none [get getter__high 9 12 none] [pop getter 21 13 none]
+G r c none [start getter__high 10 13 none] [get getter 15 12 none]
+G r c none [start getter__high 10 13 none] [trim strings 32 12 none]
+G r c none [start getter__high 10 13 none] [inc numbers 37 13 none]
+G r c none [start getter__high 10 13 none] [validate_word numbers 52 12 none]
+G r c none [start getter__high 10 13 none] [validate_variable env 13 12 none]
+G r c none [start getter__high 10 13 none] [push getter 20 13 none]
+G r c none [get_word getter__high 9 12 none] [inc numbers 37 13 none]
+G r c none [process getter__high 37 13 none] [inc numbers 37 13 none]
+G r c none [process getter__high 37 13 none] [validate_word numbers 52 12 none]
+G r c none [process getter__high 37 13 none] [validate_variable env 13 12 none]
+X 12 a-iteint.ads
+24h9 Forward_Iterator
+32h9 Reversible_Iterator<24R9[8|119]>
+X 21 a-strunb.ads
+88R9*Unbounded_String<10|43R9> 744e15 29|12r16 30|39r15 76r14
+91r4*Null_Unbounded_String{88R9} 30|48r22 88r19
+93V13*Length{natural} 30|55s21 57s59
+104V13*To_Unbounded_String{88R9} 30|47s20
+117V13*To_String{string} 30|87s26
+144U14*Append 30|90s13
+208V13*Slice{string} 30|57s36 63s38
+239V14*"="{boolean} 30|48s16
+333V13*Index{natural} 30|51s19
+X 27 env.ads
+6K9*env 17e8 29|3w6 3r15
+13V12*validate_variable{boolean} 30|63s16
+X 28 getter.ads
+4K9*getter 31e11 29|5r9 18r5 30|1r14 79r12 93r5 104r5
+15V12*get{character} 30|79s19
+20U13 push 30|93s12
+21U13 pop 30|5s5
+X 29 getter-high.ads
+5K16*high 28|4k9 29|14E8 18l12 18e16 30|1b21 104l12 104t16
+6X3*ERROR_NO_CLOSED 30|81r15
+7X3*ERROR_HIGH 30|53r17 58r19 64r17
+9V12*get{character} 30|2b12 7l7 7t10 93r17
+10U13*start 10>20 30|73b13 94l7 94t12
+10a20 s{string} 30|73b20
+14E8 types 14e39 30|97r9 99r10
+14n18 type_byte{14E8}
+14n29 type_word{14E8}
+15i3 last_index{natural} 30|15m7 18r24 33m5
+17V12 is_type{boolean} 17>21 30|45s8 96b12 103l7 103t14
+17a21 s{string} 30|96b21 99r32
+X 30 getter-high.adb
+3e5 c{character}
+9V12 get_word{string} 9b12 9>22 9>34 9>52 35l7 35t15 38s28 47s40 69s11
+9a22 s{string} 11r20 34r12
+9i34 n{natural} 24r14
+9b52 force{boolean} 14r8
+10i5 c{natural} 24r18 27m15 27r15
+11a5 ns=11:22{string} 16r12 18r36 21r17 21r23
+12i5 i{natural} 16m7 18m7 20r10 21r20 23r17 29r14 31m11 31r11 33r19 34r18
+12i8 j{natural} 20m5 23r12 29m9 34r14
+21e9 char=21:9{character} 22r10
+37U13 process 37b13 37>22 71l7 71t14 87s9
+37a22 s{string} 38r37 47r49 69r20
+38a5 first_word{string} 42r8 45r16 70r19
+39r5 tus{21|88R9} 47m9 48r12 51r25 55r28 57r42 57r66 63r44
+40i5 ti{natural} 51m9 52r12 54r15 55m11 57r47 60m11 60r17 63r52
+74b5 ignore_end{boolean} 83r26
+75e5 c{character} 79m7 80r10 83r10 86r10 90r24
+76r5 us{21|88R9} 87r36 88m9 90m20 90r20
+97e5 t{29|14E8} 99m5
+X 35 numbers.ads
+7K9*numbers 29|1w6 1r19 35|74e12
+37U13*inc 30|27s11 31s7
+52V12*validate_word{boolean} 30|57s18
+X 36 strings.ads
+8K9*strings 29|2w6 2r19 36|48e12
+10K11*unb=10:35 29|12r12 30|39r11 47r16 48r18 51r15 55r17 57r32 57r55 63r34
+. 76r10 87r22 88r15 90r9
+13U13*print=13:52 30|67s7 69s5 70s5
+32V12*trim{string} 30|87s17
+X 37 system.ads
+67M9*Address
+X 45 s-memory.ads
+53V13*Alloc{37|67M9} 103i<c,__gnat_malloc>22
+68U14*Free 104i<c,__gnat_free>22
+76V13*Realloc{37|67M9} 105i<c,__gnat_realloc>22
+X 53 s-stalib.adb
+89U14 Break_Start 90i<c,__gnat_break_start>22
+

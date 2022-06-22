@@ -17,7 +17,6 @@ with getter;
 with getter.file;
 with getter.for_loop;
 with getter.macros;
-with getter.high;
 
 with numbers; use numbers;
 with strings; use strings;
@@ -369,7 +368,6 @@ procedure a0xfa is
   function parse_label (s : string) return record_handler_type is
     tmp_word : word;
     label : label_t;
-    sl : unb.unbounded_string := unb.to_unbounded_string(s);
   begin
     if first_element(s) in '0'..'9' then
       tmp_word := parse_word(s);
@@ -906,17 +904,9 @@ procedure a0xfa is
 
   function parse_main (s : string) return record_handler_type is
   begin
-    if first_element(s) = '`' then
-      getter.high.start(s);
-    elsif first_element(s) = '.' then
+    if first_element(s) = '.' then
       return parse_instruction(s);
     elsif last_element(s) = ':' then
-      if s'length > 3 then
-        if last_element(s) /= ':' then
-          return parse_label(s(s'first..(s'last - 2)));
-        end if;
-        return parse_label(s(s'first..(s'last - 1)));
-      end if;
       return parse_label(s(s'first..(s'last - 1)));
     elsif first_element(s) in 'a'..'z' then
       if fix.index(s, "(") > 1 then
